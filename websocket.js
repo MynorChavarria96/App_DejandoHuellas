@@ -27,7 +27,7 @@ const broadcastReport = (report) => {
     // Enviar el nuevo reporte a todos los clientes conectados
     clients.forEach(client => {
         if (client.readyState === WebSocket.OPEN) {
-            client.send(JSON.stringify([report]));
+            client.send(JSON.stringify([report])); // Enviar solo el nuevo reporte
         }
     });
 };

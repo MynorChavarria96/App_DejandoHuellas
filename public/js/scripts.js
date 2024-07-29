@@ -7,15 +7,12 @@ function startWebSocket() {
     ws.onmessage = function(event) {
         const newReports = JSON.parse(event.data);
 
-        if (Array.isArray(newReports)) {
-            reports = newReports; // Reemplazar la lista completa
-        } else {
-            const report = newReports[0];
+        newReports.forEach(report => {
             const reportExists = reports.find(r => r.id === report.id);
             if (!reportExists) {
-                reports.push(report); // Agregar un solo reporte nuevo si no está ya presente
+                reports.push(report); // Agregar cada reporte nuevo si no está ya presente
             }
-        }
+        });
 
         updateReports();
     };
