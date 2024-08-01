@@ -5,6 +5,7 @@ const WebSocket = require('ws');
 const bodyParser = require('body-parser');
 const path = require('path');
 const reportRoutes = require('./routes/reportRoutes');
+const expressLayouts = require('express-ejs-layouts');
 
 const app = express();
 const server = http.createServer(app);
@@ -21,10 +22,12 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Configurar el motor de vistas EJS
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+//app.set('views', path.join(__dirname, 'views'));
+app.use(expressLayouts);
 
 // Rutas
 app.use('/', reportRoutes);
+
 
 // WebSockets
 require('./websocket')(wss);

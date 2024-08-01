@@ -14,8 +14,9 @@ exports.addReport = (req, res) => {
         chronicDisease: req.body.chronicDisease,
         ownerName: req.body.ownerName,
         phoneNumber: req.body.phoneNumber,
-        socialMedia: req.body.socialMedia,
-        photo: req.file ? `/uploads/${req.file.filename}` : null
+        photo: req.file ? `/uploads/${req.file.filename}` : null,
+        disappearanceDate: req.body.disappearanceDate,
+        disappearanceTime: req.body.disappearanceTime
     };
 
     // Solo agregar a la lista si no está ya presente
@@ -29,5 +30,19 @@ exports.addReport = (req, res) => {
 };
 
 exports.getReports = (req, res) => {
-    res.render('index', { reports });
+    res.render('perdidos', { reports });
+};
+
+exports.showIndex = (req, res) => {
+    res.render('index');
+};
+
+exports.showConsejos= (req, res) => {
+    res.render('consejos');
+};
+exports.showMisPerritos = (req, res) => {
+    res.render('misPerritos');
+};
+exports.showEncontrados= (req, res) => {
+    res.render('encontrados');
 };
