@@ -32,6 +32,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
 
+
+
+
 // Configurar sesión
 app.use(session({
     secret: 'secret',
@@ -44,13 +47,19 @@ app.use(session({
   app.use(passport.initialize());
   app.use(passport.session());
   
+// Middleware para pasar el nombre del usuario a las vistas
+    app.use((req, res, next) => {
+    res.locals.username = req.session.username || null;
+    next();
+  });
+
   // Rutas
   app.use('/', reportRoutes);
   app.use('/users', userRoutes);
 
-  app.get('/dashboard', (req, res) => {
+  app.get('/', (req, res) => {
     if (req.isAuthenticated()) {
-      res.render('dashboard');
+      res.render('Inicio');
     } else {
       res.redirect('/users/login');
     }
