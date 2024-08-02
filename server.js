@@ -4,8 +4,18 @@ const http = require('http');
 const WebSocket = require('ws');
 const bodyParser = require('body-parser');
 const path = require('path');
-const reportRoutes = require('./routes/reportRoutes');
 const expressLayouts = require('express-ejs-layouts');
+
+const session = require('express-session');
+const passport = require('passport');
+const initializePassport = require('./passportConfig');
+
+
+
+//Importar Rutas
+const reportRoutes = require('./routes/reportRoutes');
+const userRoutes = require('./routes/userRoutes');
+
 
 const app = express();
 const server = http.createServer(app);
@@ -14,25 +24,42 @@ const wss = new WebSocket.Server({ server });
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Servir archivos estáticos desde el directorio "public"
+// Servir archivos estáticos
 app.use('/public', express.static(path.join(__dirname, 'public')));
-
-// Servir archivos estáticos desde el directorio "uploads"
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Configurar el motor de vistas EJS
 app.set('view engine', 'ejs');
-//app.set('views', path.join(__dirname, 'views'));
 app.use(expressLayouts);
 
-// Rutas
-app.use('/', reportRoutes);
+// Configurar sesión
+app.use(session({
+    secret: 'secret',
+    resave: false,
+    saveUninitialized: false
+  }));
+  
+  // Inicializar Passport
+  initializePassport(passport);
+  app.use(passport.initialize());
+  app.use(passport.session());
+  
+  // Rutas
+  app.use('/', reportRoutes);
+  app.use('/users', userRoutes);
 
-
-// WebSockets
-require('./websocket')(wss);
-
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
+  app.get('/dashboard', (req, res) => {
+    if (req.isAuthenticated()) {
+      res.render('dashboard');
+    } else {
+      res.redirect('/users/login');
+    }
+  });
+  
+  // WebSockets
+  require('./websocket')(wss);
+  
+  const PORT = process.env.PORT || 8080;
+  server.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
-});
+  });

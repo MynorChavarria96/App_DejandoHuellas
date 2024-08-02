@@ -1,0 +1,13 @@
+CREATE DATABASE patitas_de_perro;
+USE patitas_de_perro;
+
+CREATE TABLE users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  username VARCHAR(25) NOT NULL UNIQUE,
+  password VARCHAR(255) NOT NULL,
+  firstName VARCHAR(150) NOT NULL,
+  lastName VARCHAR(150) NOT NULL,
+  address VARCHAR(255) NOT NULL, 
+  phone VARCHAR(15) NOT NULL
+);
+

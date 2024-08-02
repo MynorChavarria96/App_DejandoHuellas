@@ -213,6 +213,11 @@ header {
     max-width: 10rem;
 }
 
+.nav-list a.active {
+    color: rgb(188,154,126); /* Cambia este color al que prefieras */
+    font-weight: bold;
+}
+
 .nav-list {
     list-style-type: none;
     display: flex;
@@ -224,7 +229,7 @@ header {
     color: #487B68;
 }
 .nav-list li a:hover {
-        color: black;
+        color: rgb(188,154,126);
         text-decoration: none;
         cursor: pointer;
 
