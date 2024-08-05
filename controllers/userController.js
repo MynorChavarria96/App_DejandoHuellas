@@ -37,7 +37,7 @@ exports.register = async (req, res) => {
       return res.redirect('/users/login');
     } else {
       const result = await response.json();
-      errors.push(result.message || 'Error al registrar el usuario');
+      errors.push(result.message || 'El usuario ya existe');
       return res.render('register', { layout: false, errors });
     }
   } catch (err) {
