@@ -347,13 +347,26 @@ header {
     margin-bottom: 10px;
 }
 
+.filter-bar .btn-group,
+.filter-bar input[type="text"],
+.filter-bar button {
+    margin: 0 10px 10px 0;
+}
 .filter-bar input[type="text"] {
-    width: 100%;
-    max-width: 300px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    flex: 1;
 }
 
 .filter-bar button {
-    margin-bottom: 10px;
+    margin-bottom: 0;
+}
+
+.filter-bar .btn-group .btn {
+    padding: 5px 15px;
+    border-radius: 5px;
+}
+
+@media screen and (max-width: 550px) {
+    .filter-bar {
+        flex-direction: column;
+    }
 }

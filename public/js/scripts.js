@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     startWebSocket();
 });
 
+
+
 function setActiveNavLink() {
     const navLinks = document.querySelectorAll('.nav-list a');
     const currentPath = window.location.pathname;
