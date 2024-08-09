@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,27 +22,32 @@
     }
 
     .modal-content {
-      max-width: 1220px!important;
+      max-width: 1220px !important;
     }
 
-    @media (min-width: 768px) {
-      .modal-lg-custom {
-        max-width: 80%;
-      }
+    .modal-lg-custom {
+      max-width: 80%;
+    }
 
-      #btn-agregar {
-        width: 100%!important;
-      }
+    .btn-primary {
+      width: 100%;
+    }
+
+    .img-fluid {
+      max-width: 100%;
+      height: auto;
     }
   </style>
 </head>
+
 <body>
   <div class="container-fluid px-0 px-md-5">
     <div class="card">
       <div class="card-body px-md-5 px-lg-6">
         <div class="row mb-2">
           <div class="col-md-2">
-            <button type="button" id="btn-agregar" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registroModal">Agregar</button>
+            <button type="button" id="btn-agregar" class="btn btn-primary" data-bs-toggle="modal"
+              data-bs-target="#registroModal">Agregar</button>
           </div>
         </div>
       </div>
@@ -57,12 +63,13 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <form id="regForm" action="/submit-form" method="post" enctype="multipart/form-data">
+          <form id="regForm" method="post">
             <h4>Datos de la Mascota</h4>
             <div class="row mb-3">
               <div class="col-md-7">
                 <label for="nombre_mascota" class="form-label">Nombre</label>
-                <input type="text" class="form-control" maxlength="50" id="nombre_mascota" name="nombre_mascota" required>
+                <input type="text" class="form-control" maxlength="50" id="nombre_mascota" name="nombre_mascota"
+                  required>
               </div>
               <div class="col-md-1"></div>
               <div class="col-md-4">
@@ -78,7 +85,8 @@
               <div class="col-md-1"></div>
               <div class="col-md-3">
                 <label for="peso" class="form-label">Peso</label>
-                <input type="number" min="0.01" step="0.10" max="99999.99" class="form-control" id="peso" name="peso" required>
+                <input type="number" min="0.01" step="0.10" max="99999.99" class="form-control" id="peso" name="peso"
+                  required>
               </div>
               <div class="col-md-1"></div>
               <div class="col-md-4">
@@ -91,7 +99,8 @@
                 <div class="form-check form-switch">
                   <label for="flexSwitchCheckDefault" class="form-label">¿Tiene alguna enfermedad crónica?</label>
                   <div class="form-check">
-                    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="no" checked>
+                    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="no"
+                      checked>
                     <label class="form-check-label" for="exampleRadios2">NO</label>
                   </div>
                   <div class="form-check">
@@ -102,7 +111,8 @@
               </div>
               <div class="col-md-8">
                 <label for="enfermedad_cronica" class="form-label">Describa la enfermedad</label>
-                <input type="text" class="form-control" id="enfermedad_cronica" maxlength="254" name="enfermedad_cronica">
+                <input type="text" class="form-control" id="enfermedad_cronica" maxlength="254"
+                  name="enfermedad_cronica">
               </div>
             </div>
             <div class="row mb-3">
@@ -125,12 +135,15 @@
                 <div class="row mb-3">
                   <div class="col-md-12">
                     <label for="formFile" class="form-label">Foto</label>
-                    <input class="form-control" type="file" id="formFile" name="foto" accept="image/*" onchange="uploadImage(event)">
+                    <input class="form-control" type="file" id="formFile" name="foto" accept="image/*"
+                      onchange="uploadImage(event)">
+                    <input type="hidden" id="foto_ruta" name="foto_ruta">
                   </div>
                 </div>
               </div>
               <div class="col-md-5 px-md-5 px-lg-6">
-                <img id="previewImage" src="/public/images/default.jpg" class="img-fluid rounded mx-auto d-block" alt="...">
+                <img id="previewImage" src="/public/images/default.jpg" class="img-fluid rounded mx-auto d-block"
+                  alt="...">
               </div>
             </div>
             <div class="row justify-content-center">
@@ -156,34 +169,86 @@
       const btnAgregar = document.getElementById('btn-agregar');
       const btnGuardar = document.getElementById('btn-guardar');
 
+
       btnAgregar.addEventListener('click', () => {
         cargarEspecies();
         cargarGeneros();
       });
 
-      btnGuardar.addEventListener('click', (event) => {
+      btnGuardar.addEventListener('click', async (event) => {
         event.preventDefault();
-        const formData = new FormData(document.getElementById('regForm'));
-        console.log('Formulario de datos:');
-        for (let [key, value] of formData.entries()) {
-          console.log(`${key}: ${value}`);
-        }
-      });
+        const fotoRuta = document.getElementById('previewImage').src;
+        let fullPath = document.getElementById('previewImage').src;
+        let url = new URL(fullPath);
+        let localPath = url.pathname; // Esto te dará la ruta relativa sin el dominio // 
 
-      function toggleEnfermedadInput() {
-        if (radioSi.checked) {
-          enfermedadInput.disabled = false;
-          enfermedadInput.setAttribute('required', '');
-        } else if (radioNo.checked) {
-          enfermedadInput.disabled = true;
-          enfermedadInput.value = '';
-          enfermedadInput.removeAttribute('required');
+        const formData = {
+          nombre: document.getElementById('nombre_mascota').value,
+          especie_id: document.getElementById('especie').value,
+          raza: document.getElementById('raza').value,
+          genero_id: document.getElementById('genero').value,
+          fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
+          color: document.getElementById('color').value,
+          peso: document.getElementById('peso').value,
+          foto: localPath,
+          enfermedad_cronica: document.getElementById('enfermedad_cronica').value,
+          propietario_id: <%= propietarioId %> // Usar el propietarioId desde la sesión
+        };
+
+      try {
+        const response = await fetch('mascotas/registrar', { // Cambia la URL si es necesario
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          toastr.success('Mascota registrada exitosamente');
+          console.log('Respuesta de la API:', result);
+          // Aquí puedes redirigir o hacer algo después de guardar la mascota
+
+          // Cerrar el modal
+          const modalElement = document.getElementById('registroModal');
+          const modal = bootstrap.Modal.getInstance(modalElement);
+          modal.hide();
+
+          // Limpiar el formulario
+          document.getElementById('regForm').reset();
+          document.getElementById('previewImage').src = '/public/images/default.jpg'; // Restablecer la imagen a la predeterminada
+
+          // Forzar eliminación del backdrop
+          document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+
+        } else {
+          const errorResult = await response.json();
+          toastr.error('Error al registrar la mascota: ' + errorResult.message);
+         
         }
+      } catch (error) {
+        toastr.error('Error de conexión con la API');
+
       }
+    });
 
-      toggleEnfermedadInput();
-      radioSi.addEventListener('change', toggleEnfermedadInput);
-      radioNo.addEventListener('change', toggleEnfermedadInput);
+
+
+    function toggleEnfermedadInput() {
+      if (radioSi.checked) {
+        enfermedadInput.disabled = false;
+        enfermedadInput.setAttribute('required', '');
+      } else if (radioNo.checked) {
+        enfermedadInput.disabled = true;
+        enfermedadInput.value = '';
+        enfermedadInput.removeAttribute('required');
+      }
+    }
+
+    toggleEnfermedadInput();
+    radioSi.addEventListener('change', toggleEnfermedadInput);
+    radioNo.addEventListener('change', toggleEnfermedadInput);
     });
 
     function cargarEspecies() {
@@ -218,15 +283,6 @@
         .catch(error => console.error('Error al cargar los generos:', error));
     }
 
-    function previewImage(event) {
-      const reader = new FileReader();
-      reader.onload = function () {
-        const output = document.getElementById('previewImage');
-        output.src = reader.result;
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
-
     async function uploadImage(event) {
       const fileInput = event.target;
       const formData = new FormData();
@@ -241,15 +297,20 @@
         const data = await response.json();
 
         if (response.ok) {
-          document.getElementById('previewImage').src = data.filePath;
+          const previewImage = document.getElementById('previewImage');
+          previewImage.src = data.filePath;
+          return data.filePath;
         } else {
           toastr.error('Error al subir la imagen');
+          return null;
         }
       } catch (error) {
         console.error('Error al subir la imagen:', error);
         toastr.error('Error al subir la imagen');
+        return null;
       }
     }
   </script>
 </body>
+
 </html>
