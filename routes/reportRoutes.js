@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const { ensureAuthenticated } = require('../middleware/auth');
-const { addReport, getReports, showIndex, showEncontrados, showConsejos, showMisPerritos } = require('../controllers/reportController');
+const { addReport, getReports, showIndex, showEncontrados, showConsejos, showMisMascotas } = require('../controllers/reportController');
 
 const router = express.Router();
 const upload = multer({ dest: 'uploads/' });
@@ -11,7 +11,7 @@ router.get('/', ensureAuthenticated, showIndex);
 router.get('/perdidos', ensureAuthenticated, getReports);
 router.get('/encontrados', ensureAuthenticated, showEncontrados);
 router.get('/consejos', ensureAuthenticated, showConsejos);
-router.get('/mis-perritos', ensureAuthenticated, showMisPerritos);
+router.get('/mis-mascotas', ensureAuthenticated, showMisMascotas);
 
 
 // Ruta para manejar la subida de reportes

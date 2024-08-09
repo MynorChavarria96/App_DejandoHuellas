@@ -40,8 +40,8 @@ exports.showIndex = (req, res) => {
 exports.showConsejos= (req, res) => {
     res.render('consejos');
 };
-exports.showMisPerritos = (req, res) => {
-    res.render('misPerritos');
+exports.showMisMascotas= (req, res) => {
+    res.render('misMascotas');
 };
 exports.showEncontrados= (req, res) => {
     res.render('encontrados');

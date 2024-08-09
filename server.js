@@ -8,16 +8,31 @@ const expressLayouts = require('express-ejs-layouts');
 const session = require('express-session');
 const passport = require('passport');
 const initializePassport = require('./passportConfig');
+const multer = require('multer');
 
 // Importar rutas
 const reportRoutes = require('./routes/reportRoutes');
 const userRoutes = require('./routes/userRoutes');
+const mascotaRoutes = require('./routes/mascotaRoutes');
 const { ensureAuthenticated } = require('./middleware/auth');
 
 // Configurar Express
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+
+// Configuración de multer para almacenar archivos
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ storage: storage });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -45,10 +60,21 @@ app.use(passport.session());
 // Middleware para pasar el nombre del usuario a las vistas
 app.use((req, res, next) => {
   res.locals.username = req.session.username || null;
+  res.locals.userId = req.session.userId || null;
+  res.locals.propietarioId = req.session.propietarioId || null;
   next();
 });
 
+// Ruta para cargar la imagen
+app.post('/upload', upload.single('foto'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send('No se subió ningún archivo.');
+  }
+  res.json({ filePath: `/uploads/${req.file.filename}` });
+});
+
 // Rutas
+app.use('/mascotas', mascotaRoutes);
 app.use('/users', userRoutes);
 app.use('/', ensureAuthenticated, reportRoutes);
 
