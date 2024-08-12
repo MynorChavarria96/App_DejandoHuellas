@@ -7,6 +7,9 @@
   <title>Registro de Mascota</title>
   <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.css">
+
   <style>
     form input[type=date] {
       width: 100% !important;
@@ -25,17 +28,24 @@
       max-width: 1220px !important;
     }
 
-    .modal-lg-custom {
-      max-width: 80%;
-    }
-
-    .btn-primary {
-      width: 100%;
-    }
-
     .img-fluid {
       max-width: 100%;
       height: auto;
+    }
+
+    .table img {
+      max-width: 100px;
+      height: auto;
+    }
+
+    @media (min-width: 768px) {
+      .modal-lg-custom {
+        max-width: 80%;
+      }
+
+      #btn-agregar {
+        width: 100% !important;
+      }
     }
   </style>
 </head>
@@ -48,6 +58,28 @@
           <div class="col-md-2">
             <button type="button" id="btn-agregar" class="btn btn-primary" data-bs-toggle="modal"
               data-bs-target="#registroModal">Agregar</button>
+          </div>
+        </div>
+        <div class="row mb-2">
+          <div class="table-responsive ">
+            <table id="mascotasTable" class="table table-bordered table-striped responsive">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nombre</th>
+                  <th>Especie</th>
+                  <th>Raza</th>
+                  <th>Género</th>
+                  <th>Fecha de Nacimiento</th>
+                  <th>Color</th>
+                  <th>Enfermedad Crónica</th>
+                  <th>Foto</th>
+                </tr>
+              </thead>
+              <tbody id="mascotasTableBody">
+                <!-- Aquí se insertarán las filas dinámicamente -->
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -156,11 +188,15 @@
       </div>
     </div>
   </div>
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap5.min.js"></script>
   <script src="https://unpkg.com/@popperjs/core@2"></script>
   <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.js"></script>
+  <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.js"></script>
+
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const radioSi = document.getElementById('exampleRadios1');
@@ -168,7 +204,7 @@
       const enfermedadInput = document.getElementById('enfermedad_cronica');
       const btnAgregar = document.getElementById('btn-agregar');
       const btnGuardar = document.getElementById('btn-guardar');
-
+      cargarMascotas();
 
       btnAgregar.addEventListener('click', () => {
         cargarEspecies();
@@ -180,7 +216,7 @@
         const fotoRuta = document.getElementById('previewImage').src;
         let fullPath = document.getElementById('previewImage').src;
         let url = new URL(fullPath);
-        let localPath = url.pathname; // Esto te dará la ruta relativa sin el dominio // 
+        let localPath = url.pathname; // Esto te dará la ruta relativa sin el dominio //
 
         const formData = {
           nombre: document.getElementById('nombre_mascota').value,
@@ -195,60 +231,60 @@
           propietario_id: <%= propietarioId %> // Usar el propietarioId desde la sesión
         };
 
-      try {
-        const response = await fetch('mascotas/registrar', { // Cambia la URL si es necesario
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(formData)
-        });
+        try {
+          const response = await fetch('mascotas/registrar', { // Cambia la URL si es necesario
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
 
-        if (response.ok) {
-          const result = await response.json();
-          toastr.success('Mascota registrada exitosamente');
-          console.log('Respuesta de la API:', result);
-          // Aquí puedes redirigir o hacer algo después de guardar la mascota
+          if (response.ok) {
+            const result = await response.json();
+            toastr.success('Mascota registrada exitosamente');
+            console.log('Respuesta de la API:', result);
+            // Aquí puedes redirigir o hacer algo después de guardar la mascota
 
-          // Cerrar el modal
-          const modalElement = document.getElementById('registroModal');
-          const modal = bootstrap.Modal.getInstance(modalElement);
-          modal.hide();
+            // Cerrar el modal
+            const modalElement = document.getElementById('registroModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
 
-          // Limpiar el formulario
-          document.getElementById('regForm').reset();
-          document.getElementById('previewImage').src = '/public/images/default.jpg'; // Restablecer la imagen a la predeterminada
+            // Limpiar el formulario
+            document.getElementById('regForm').reset();
+            document.getElementById('previewImage').src = '/public/images/default.jpg'; // Restablecer la imagen a la predeterminada
 
-          // Forzar eliminación del backdrop
-          document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+            // Forzar eliminación del backdrop
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
 
-        } else {
-          const errorResult = await response.json();
-          toastr.error('Error al registrar la mascota: ' + errorResult.message);
-         
+          } else {
+            const errorResult = await response.json();
+            toastr.error('Error al registrar la mascota: ' + errorResult.message);
+
+          }
+        } catch (error) {
+          toastr.error('Error de conexión con la API');
+
         }
-      } catch (error) {
-        toastr.error('Error de conexión con la API');
+      });
 
+
+
+      function toggleEnfermedadInput() {
+        if (radioSi.checked) {
+          enfermedadInput.disabled = false;
+          enfermedadInput.setAttribute('required', '');
+        } else if (radioNo.checked) {
+          enfermedadInput.disabled = true;
+          enfermedadInput.value = '';
+          enfermedadInput.removeAttribute('required');
+        }
       }
-    });
 
-
-
-    function toggleEnfermedadInput() {
-      if (radioSi.checked) {
-        enfermedadInput.disabled = false;
-        enfermedadInput.setAttribute('required', '');
-      } else if (radioNo.checked) {
-        enfermedadInput.disabled = true;
-        enfermedadInput.value = '';
-        enfermedadInput.removeAttribute('required');
-      }
-    }
-
-    toggleEnfermedadInput();
-    radioSi.addEventListener('change', toggleEnfermedadInput);
-    radioNo.addEventListener('change', toggleEnfermedadInput);
+      toggleEnfermedadInput();
+      radioSi.addEventListener('change', toggleEnfermedadInput);
+      radioNo.addEventListener('change', toggleEnfermedadInput);
     });
 
     function cargarEspecies() {
@@ -309,6 +345,47 @@
         toastr.error('Error al subir la imagen');
         return null;
       }
+    }
+
+    function cargarMascotas() {
+      fetch('/mascotas/mias-mascotas')
+        .then(response => response.json())
+        .then(data => {
+          const mascotasTableBody = document.getElementById('mascotasTableBody');
+          mascotasTableBody.innerHTML = ''; // Limpiar cualquier contenido previo
+
+          if (data.length === 0) {
+            mascotasTableBody.innerHTML = '<tr><td colspan="9" class="text-center">No tienes mascotas registradas.</td></tr>';
+          } else {
+            data.forEach(mascota => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${mascota.mascota_id}</td>
+                <td>${mascota.nombre}</td>
+                <td>${mascota.nombre_especie}</td>
+                <td>${mascota.raza}</td>
+                <td>${mascota.nombre_genero}</td>
+                <td>${new Date(mascota.fecha_nacimiento).toLocaleDateString()}</td>
+                <td>${mascota.color}</td>
+                <td>${mascota.enfermedad_cronica || 'N/A'}</td>
+                <td><img src="${mascota.foto}" alt="${mascota.nombre}" class="img-fluid"></td>
+              `;
+              mascotasTableBody.appendChild(row);
+            });
+            // Inicializar DataTables
+            $('#mascotasTable').DataTable({
+              responsive: true,
+              language: {
+                url: "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json"
+              }
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error al cargar las mascotas:', error);
+          const mascotasTableBody = document.getElementById('mascotasTableBody');
+          mascotasTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error al cargar las mascotas.</td></tr>';
+        });
     }
   </script>
 </body>

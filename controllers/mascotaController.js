@@ -20,10 +20,24 @@ exports.obtenerGeneros = async (req, res) => {
       res.status(500).json({ message: 'Error al obtener los géneros' });
     }
   };
+
+  exports.misMascotas = async (req, res) => {
+    try {
+        const propietarioId = req.session.propietarioId;
+        const response = await fetch(`http://localhost:3000/api/mascotas/mismascotas/${propietarioId}`);
+        const mascotas = await response.json();
+        res.json(mascotas);
+
+    } catch (error) {
+      res.status(500).json({ message: 'No se encontraron' });
+    }
+};
+
+
+
+
   exports.registrarMascota = async (req, res) => {
     try {
-     
-  
       // Enviar los datos a la API
       const response = await fetch('http://localhost:3000/api/mascotas/', {
         method: 'POST',
@@ -43,5 +57,7 @@ exports.obtenerGeneros = async (req, res) => {
       res.status(500).json({ message: 'Error interno del servidor' });
     }
   };
+
+
   
   
