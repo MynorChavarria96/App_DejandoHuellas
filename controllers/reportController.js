@@ -46,3 +46,6 @@ exports.showMisMascotas= (req, res) => {
 exports.showEncontrados= (req, res) => {
     res.render('encontrados');
 };
+exports.showDetalles= (req, res) => {
+    res.render('detalles-mascota');
+};
