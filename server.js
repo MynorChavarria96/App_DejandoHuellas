@@ -74,6 +74,7 @@ app.post('/upload', upload.single('foto'), (req, res) => {
 });
 
 // Rutas
+app.use('/mis-mascotas', mascotaRoutes);
 app.use('/mascotas', mascotaRoutes);
 app.use('/users', userRoutes);
 app.use('/', ensureAuthenticated, reportRoutes);

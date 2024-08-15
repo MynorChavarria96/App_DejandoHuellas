@@ -7,6 +7,7 @@
     <title>Detalles de la Mascota</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <style>
         form input[type=date] {
             width: 100% !important;
@@ -152,7 +153,7 @@
                         </div>
                         <div class="row justify-content-center">
                             <div class="col-12 col-md-2">
-                                <button type="button" id="btn-guardar" class="btn btn-primary w-100">Guardar</button>
+                                <button type="button" id="btn-actualizar" class="btn btn-primary w-100">Actualizar</button>
                             </div>
                         </div>
                     </form>
@@ -160,13 +161,15 @@
             </div>
         </div>
     </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const mascotaDetalles = document.getElementById('mascotaDetalles');
             const radioSi = document.getElementById('exampleRadios1');
             const radioNo = document.getElementById('exampleRadios2');
             const enfermedadInput = document.getElementById('enfermedad_cronica');
+            const btnActualizar = document.getElementById('btn-actualizar');
             // Recuperar la información de la mascota desde sessionStorage
             const mascota = JSON.parse(sessionStorage.getItem('mascotaSeleccionada'));
             // Función para habilitar o deshabilitar el campo de entrada
@@ -198,8 +201,14 @@
                 if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
                     edad--;
                 }
+                if (edad === 1) {
+                    return (edad + ' año');
+                }
+                else {
+                    return (edad + ' años');
+                }
 
-                return edad;
+
             }
             // Función para formatear la fecha en formato YYYY-MM-DD
             function formatearFecha(fecha) {
@@ -221,7 +230,7 @@
                             <p><strong>Especie:</strong> ${mascota.nombre_especie}</p>
                             <p><strong>Raza:</strong> ${mascota.raza}</p>
                             <p><strong>Género:</strong> ${mascota.nombre_genero}</p>
-                            <p><strong>Fecha de Nacimiento:</strong> ${new Date(mascota.fecha_nacimiento).toLocaleDateString()} (${calcularEdad(mascota.fecha_nacimiento)} años)</p>
+                            <p><strong>Fecha de Nacimiento:</strong> ${new Date(mascota.fecha_nacimiento).toLocaleDateString()} (${calcularEdad(mascota.fecha_nacimiento)})</p>
                             <p><strong>Color:</strong> ${mascota.color}</p>
                             <p><strong>Peso:</strong> ${mascota.peso} lbs.</p>
                             <p><strong>Enfermedad Crónica:</strong> ${mascota.enfermedad_cronica || 'N/A'}</p>
@@ -232,7 +241,7 @@
                         </div>
                     </div>
                 `;
-
+                console.log(mascota)
                 // Agregar el evento click al botón de editar después de generar el contenido
                 document.querySelector('.btn-warning').addEventListener('click', () => {
                     // Llenar el formulario con los datos de la mascota
@@ -251,7 +260,76 @@
             } else {
                 mascotaDetalles.innerHTML = '<p class="text-danger text-center">No se pudo cargar la información de la mascota.</p>';
             }
+
+            btnActualizar.addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    const fotoRuta = document.getElementById('previewImage').src;
+    let fullPath = document.getElementById('previewImage').src;
+    let url = new URL(fullPath);
+    let localPath = url.pathname; // Esto te dará la ruta relativa sin el dominio //
+
+    // Crear el objeto formData
+    const formData = {
+        nombre: document.getElementById('nombre_mascota').value,
+        especie_id: document.getElementById('especie').value,
+        raza: document.getElementById('raza').value,
+        genero_id: document.getElementById('genero').value,
+        fecha_nacimiento: document.getElementById('fecha_nacimiento').value,
+        color: document.getElementById('color').value,
+        peso: document.getElementById('peso').value,
+        foto: localPath,
+        enfermedad_cronica: document.getElementById('enfermedad_cronica').value,
+        propietario_id: <%= propietarioId %> // Usar el propietarioId desde la sesión
+    };
+
+    // Extraer el mascota_id para usarlo en la URL
+    const mascota_id = mascota.mascota_id;
+
+    try {
+        const response = await fetch(`/mis-mascotas/actualizar/${mascota_id}`, { // Incluye el mascota_id en la URL
+            method: 'PUT', 
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData) // Enviar el formData sin el mascota_id
         });
+
+        if (response.ok) {
+            const result = await response.json();
+            toastr.success('Mascota actualizada exitosamente');
+            console.log('Respuesta de la API:', result);
+
+            
+
+          // Esperar 3 segundos (3000 ms) antes de redirigir
+          setTimeout(() => {
+            // Cerrar el modal
+            const modalElement = document.getElementById('registroModal');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            modal.hide();
+
+            // Limpiar el formulario
+            document.getElementById('regForm').reset();
+            document.getElementById('previewImage').src = '/public/images/default.jpg'; // Restablecer la imagen a la predeterminada
+
+            // Forzar eliminación del backdrop
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+                window.location.href = '/mis-mascotas';
+            }, 3000);
+
+        } else {
+            const errorResult = await response.json();
+            toastr.error('Error al actualizar la mascota: ' + errorResult.message);
+        }
+    } catch (error) {
+        toastr.error('Error de conexión con la API');
+    }
+});
+
+
+        });
+
 
         function cargarEspecies(especieIdSeleccionada) {
             fetch('/mascotas/especies')
