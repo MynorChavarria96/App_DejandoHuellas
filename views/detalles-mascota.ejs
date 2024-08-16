@@ -163,6 +163,7 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const mascotaDetalles = document.getElementById('mascotaDetalles');
@@ -170,6 +171,7 @@
             const radioNo = document.getElementById('exampleRadios2');
             const enfermedadInput = document.getElementById('enfermedad_cronica');
             const btnActualizar = document.getElementById('btn-actualizar');
+            
             // Recuperar la información de la mascota desde sessionStorage
             const mascota = JSON.parse(sessionStorage.getItem('mascotaSeleccionada'));
             // Función para habilitar o deshabilitar el campo de entrada
@@ -236,7 +238,7 @@
                             <p><strong>Enfermedad Crónica:</strong> ${mascota.enfermedad_cronica || 'N/A'}</p>
                             <p>
                                 <button class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#registroModal">Editar</button>
-                                <button class="btn btn-danger">Eliminar</button>
+                                <button class="btn btn-danger" id="btn-eliminar">Eliminar</button>
                             </p>
                         </div>
                     </div>
@@ -326,6 +328,64 @@
         toastr.error('Error de conexión con la API');
     }
 });
+const btnEliminar = document.getElementById('btn-eliminar');
+
+btnEliminar.addEventListener('click', async (event) => {
+    event.preventDefault();
+    const mascota_id = mascota.mascota_id;
+
+    // Mostrar la alerta de confirmación
+    Swal.fire({
+        title: '¿Estás seguro de eliminar la mascota?',
+        text: "No podrás revertir esta acción",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/mis-mascotas/eliminar/${mascota_id}`, {
+                    method: 'PUT', 
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    Swal.fire(
+                        'Eliminada',
+                        'La mascota ha sido eliminada.',
+                        'success'
+                    );
+
+                    // Esperar 2 segundos (2000 ms) antes de redirigir
+                    setTimeout(() => {
+                        window.location.href = '/mis-mascotas';
+                    }, 2000);
+
+                } else {
+                    const errorResult = await response.json();
+                    Swal.fire(
+                        'Error',
+                        'Error al eliminar la mascota: ' + errorResult.message,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                Swal.fire(
+                    'Error',
+                    'Error de conexión con la API',
+                    'error'
+                );
+            }
+        }
+    });
+});
+
 
 
         });
