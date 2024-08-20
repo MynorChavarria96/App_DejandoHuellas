@@ -3,7 +3,7 @@ let reports = [];
 
 document.addEventListener('DOMContentLoaded', function() {
     setActiveNavLink();
-    initializeReportsView();
+    //initializeReportsView();
     initializeNavbar();
     startWebSocket();
 });

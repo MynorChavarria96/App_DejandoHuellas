@@ -1,6 +1,24 @@
 // controllers/mascotaController.js
 const fetch = require('node-fetch');
 
+
+exports.showIndex = (req, res) => {
+  res.render('index');
+};
+
+exports.showConsejos= (req, res) => {
+  res.render('consejos');
+};
+exports.showMisMascotas= (req, res) => {
+  res.render('misMascotas');
+};
+exports.showEncontrados= (req, res) => {
+  res.render('encontrados');
+};
+exports.showDetalles= (req, res) => {
+  res.render('detalles-mascota');
+};
+
 exports.obtenerEspecies = async (req, res) => {
   try {
     const response = await fetch('http://localhost:3000/api/mascotas/especies');
@@ -9,6 +27,9 @@ exports.obtenerEspecies = async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener las especies' });
   }
+};
+exports.showinfoQr = (req, res) => {
+  res.render('infoQr', { layout: false, errors: [] });
 };
 
 exports.obtenerGeneros = async (req, res) => {

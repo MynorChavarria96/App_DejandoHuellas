@@ -43,7 +43,7 @@
     <div class="container-fluid px-0 px-md-5">
         <div class="card">
             <div class="m-2 col-md-3">
-                <a href="/mis-mascotas" class="btn btn-secondary">
+                <a href="/mias-mascotas" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Volver
                 </a>
             </div>
@@ -317,7 +317,7 @@
 
             // Forzar eliminación del backdrop
             document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
-                window.location.href = '/mis-mascotas';
+                window.location.href = '/mias-mascotas';
             }, 3000);
 
         } else {
@@ -364,7 +364,7 @@ btnEliminar.addEventListener('click', async (event) => {
 
                     // Esperar 2 segundos (2000 ms) antes de redirigir
                     setTimeout(() => {
-                        window.location.href = '/mis-mascotas';
+                        window.location.href = '/mias-mascotas';
                     }, 2000);
 
                 } else {

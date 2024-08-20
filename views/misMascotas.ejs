@@ -197,6 +197,7 @@
   <script src="https://unpkg.com/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.js"></script>
   <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.3/dist/heic2any.min.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -319,32 +320,59 @@
     }
 
     async function uploadImage(event) {
-      const fileInput = event.target;
-      const formData = new FormData();
-      formData.append('foto', fileInput.files[0]);
+  const fileInput = event.target;
+  const file = fileInput.files[0];
+  const formData = new FormData();
 
-      try {
-        const response = await fetch('/upload', {
-          method: 'POST',
-          body: formData
-        });
+  if (!file) {
+    toastr.error('No se seleccionó ningún archivo');
+    return null;
+  }
 
-        const data = await response.json();
+  let processedFile = file;
 
-        if (response.ok) {
-          const previewImage = document.getElementById('previewImage');
-          previewImage.src = data.filePath;
-          return data.filePath;
-        } else {
-          toastr.error('Error al subir la imagen');
-          return null;
-        }
-      } catch (error) {
-        console.error('Error al subir la imagen:', error);
-        toastr.error('Error al subir la imagen');
-        return null;
-      }
+  // Verifica si el archivo es HEIC o HEIF
+  if (file.type === "image/heic" || file.type === "image/heif") {
+    try {
+      const blob = await heic2any({
+        blob: file,
+        toType: "image/jpeg",
+      });
+
+      processedFile = new File([blob], file.name.replace(/\.\w+$/, ".jpg"), { type: "image/jpeg" });
+
+    } catch (error) {
+      console.error('Error al convertir la imagen:', error);
+      toastr.error('Error al convertir la imagen HEIC');
+      return null;
     }
+  }
+
+  // Agrega el archivo (convertido o no) al FormData
+  formData.append('foto', processedFile);
+
+  try {
+    const response = await fetch('/upload', {
+      method: 'POST',
+      body: formData,
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      const previewImage = document.getElementById('previewImage');
+      previewImage.src = data.filePath;
+      return data.filePath;
+    } else {
+      toastr.error('Error al subir la imagen');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error al subir la imagen:', error);
+    toastr.error('Error al subir la imagen');
+    return null;
+  }
+}
 
     
 function cargarMascotas() {
@@ -385,7 +413,7 @@ function cargarMascotas() {
                         sessionStorage.setItem('mascotaSeleccionada', JSON.stringify(mascotaSeleccionada));
 
                         // Redirigir a la vista de detalles
-                        window.location.href = `/mis-mascotas/detalles/${mascotaId}`;
+                        window.location.href = `/mias-mascotas/detalles/${mascotaId}`;
                     });
                 });
                
