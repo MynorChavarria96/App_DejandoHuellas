@@ -234,7 +234,7 @@
     };
 
     try {
-        const response = await fetch('mascotas/registrar', { // Cambia la URL si es necesario
+        const response = await fetch('mis-mascotas/registrar', { // Cambia la URL si es necesario
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -288,7 +288,7 @@
     });
 
     function cargarEspecies() {
-      fetch('/mascotas/especies')
+      fetch('/mis-mascotas/especies')
         .then(response => response.json())
         .then(data => {
           const especieSelect = document.getElementById('especie');
@@ -304,7 +304,7 @@
     }
 
     function cargarGeneros() {
-      fetch('/mascotas/generos')
+      fetch('/mis-mascotas/generos')
         .then(response => response.json())
         .then(data => {
           const generoSelect = document.getElementById('genero');
@@ -376,7 +376,7 @@
 
     
 function cargarMascotas() {
-    fetch('/mascotas/mis-mascotas')
+    fetch('mis-mascotas/mis-mascotas')
         .then(response => response.json())
         .then(data => {
             const mascotasTableBody = document.getElementById('mascotasTableBody');

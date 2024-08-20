@@ -28,9 +28,7 @@ exports.obtenerEspecies = async (req, res) => {
     res.status(500).json({ message: 'Error al obtener las especies' });
   }
 };
-exports.showinfoQr = (req, res) => {
-  res.render('infoQr', { layout: false, errors: [] });
-};
+
 
 exports.obtenerGeneros = async (req, res) => {
   try {

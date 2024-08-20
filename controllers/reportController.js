@@ -1,51 +1,20 @@
-// const { broadcastReport, reports } = require('../websocket');
-// const fs = require('fs');
-// const path = require('path');
+exports.infoQR = (req, res) => {
+  res.render('infoQr', { layout: false });
+};
 
-// exports.addReport = (req, res) => {
-//     const report = {
-//         id: Date.now(),
-//         name: req.body.name,
-//         lastSeenLocation: req.body.lastSeenLocation,
-//         color: req.body.color,
-//         breed: req.body.breed,
-//         age: req.body.age,
-//         description: req.body.description,
-//         chronicDisease: req.body.chronicDisease,
-//         ownerName: req.body.ownerName,
-//         phoneNumber: req.body.phoneNumber,
-//         photo: req.file ? `/uploads/${req.file.filename}` : null,
-//         disappearanceDate: req.body.disappearanceDate,
-//         disappearanceTime: req.body.disappearanceTime
-//     };
+exports.mascotaQR = async (req, res) => {
+  try {
+      const { identificador_qr } = req.params;
+      const response = await fetch(`http://localhost:3000/api/infoqr/${identificador_qr}`);
+      const mascota = await response.json();
 
-//     // Solo agregar a la lista si no está ya presente
-//     const reportExists = reports.find(r => r.id === report.id);
-//     if (!reportExists) {
-//         reports.push(report);
-//     }
+      if (!mascota) {
+          return res.status(404).json({ message: 'Mascota no encontrada' });
+      }
 
-//     broadcastReport(report);  // Enviar el reporte a través de WebSocket
-//     res.status(200).json(report);
-// };
-
-// exports.getReports = (req, res) => {
-//     res.render('perdidos', { reports });
-// };
-
-// // exports.showIndex = (req, res) => {
-// //     res.render('index');
-// // };
-
-// // exports.showConsejos= (req, res) => {
-// //     res.render('consejos');
-// // };
-// // exports.showMisMascotas= (req, res) => {
-// //     res.render('misMascotas');
-// // };
-// // exports.showEncontrados= (req, res) => {
-// //     res.render('encontrados');
-// // };
-// // exports.showDetalles= (req, res) => {
-// //     res.render('detalles-mascota');
-// // };
+      res.json(mascota);
+  } catch (error) {
+      console.error('Error al obtener la mascota:', error);
+      res.status(500).json({ message: 'Error al obtener la información de la mascota' });
+  }
+};

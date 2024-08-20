@@ -17,7 +17,7 @@ router.get('/generos', mascotaController.obtenerGeneros);
 
 router.get('/mis-mascotas', mascotaController.misMascotas);
 
-router.get('/info-QR', mascotaController.showinfoQr);
+
 
 // Ruta para procesar el formulario de registro de mascota
 router.post('/registrar', mascotaController.registrarMascota);

@@ -11,7 +11,7 @@ const initializePassport = require('./passportConfig');
 const multer = require('multer');
 
 // Importar rutas
-// const reportRoutes = require('./routes/reportRoutes');
+const reportRoutes = require('./routes/reportRoutes');
 const userRoutes = require('./routes/userRoutes');
 const mascotaRoutes = require('./routes/mascotaRoutes');
 const { ensureAuthenticated } = require('./middleware/auth');
@@ -74,8 +74,9 @@ app.post('/upload', upload.single('foto'), (req, res) => {
 });
 
 // Rutas
+
 app.use('/mis-mascotas', mascotaRoutes);
-app.use('/mascotas', mascotaRoutes);
+app.use('/info', reportRoutes);
 app.use('/users', userRoutes);
 app.use('/', ensureAuthenticated, mascotaRoutes);
 
