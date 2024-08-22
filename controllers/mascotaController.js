@@ -16,7 +16,7 @@ exports.showEncontrados= (req, res) => {
   res.render('encontrados');
 };
 exports.showDetalles= (req, res) => {
-  res.render('detalles-mascota');
+  res.render('detalles-mascota', {tunel_LocalHost: process.env.TUNEL_LOCALHOST});
 };
 
 exports.obtenerEspecies = async (req, res) => {

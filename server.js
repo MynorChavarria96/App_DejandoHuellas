@@ -62,6 +62,7 @@ app.use((req, res, next) => {
   res.locals.username = req.session.username || null;
   res.locals.userId = req.session.userId || null;
   res.locals.propietarioId = req.session.propietarioId || null;
+  res.locals.tunel_LocalHost = process.env.TUNEL_LOCALHOST;
   next();
 });
 
