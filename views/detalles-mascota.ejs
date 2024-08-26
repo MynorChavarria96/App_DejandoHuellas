@@ -31,6 +31,14 @@
             height: auto;
         }
 
+        .mascota-foto img {
+            max-width: 300px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+            border-radius: 50%;
+        }
+
         @media (min-width: 768px) {
             .modal-lg-custom {
                 max-width: 80%;
@@ -162,7 +170,24 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal ver Foto -->
+    <div class="modal fade" id="imagenModal" tabindex="-1" aria-labelledby="imagenModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="imagenModalLabel"></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <img src="" alt="" id="imagenAmpliada" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
@@ -229,12 +254,12 @@
 
             if (mascota) {
                 mascotaDetalles.innerHTML = `
-                    <div class="col-md-4 text-center">
-                        <img src="${mascota.foto}" alt="${mascota.nombre}" class="img-fluid rounded mb-3" style="max-width: 250px;">
+                    <div class="col-md-4 mx-auto d-flex justify-content-center align-items-center mascota-foto">
+                    <img src="${mascota.foto}" alt="${mascota.nombre}" class="img-fluid" onclick="mostrarImagenAmpliada('${mascota.foto}', '${mascota.nombre}')">
                     </div>
                     <div class="col-md-4 d-flex align-items-center">
                         <div class="w-100">
-                            <h2 class="fw-bold text-uppercase text-center w-100 ">${mascota.nombre}</h2>
+                            <h2 class="fw-bold text-uppercase text-center w-100 mt-2">${mascota.nombre}</h2>
                             <p><strong>Especie:</strong> ${mascota.nombre_especie}</p>
                             <p><strong>Raza:</strong> ${mascota.raza}</p>
                             <p><strong>Género:</strong> ${mascota.nombre_genero}</p>
@@ -249,15 +274,15 @@
                         </div>
                     </div>
                    <div class="col-md-4 d-flex justify-content-center align-items-center">
-         <div class="col-md-4 d-flex justify-content-center align-items-center flex-column">
-        <div class="row w-100">
-            <div class="col-12 d-flex justify-content-center mb-3" id="qrcode-${mascota.identificador_qr}"></div> <!-- Contenedor del QR -->
-            <div class="col-12">
-                <button id="downloadQr" class="btn btn-primary w-100">Descargar QR</button> <!-- Botón de descarga -->
+                 <div class="row">
+                <div class="col-12 d-flex justify-content-center" id="qrcode-${mascota.identificador_qr}">
+                    <!-- Aquí va el código QR -->
+                </div>
+                <div class="col-12 col-md-8 mt-3 mx-auto d-flex justify-content-center">
+                    <button id="downloadQr" class="btn btn-primary w-100 w-md-auto">Descargar QR</button>
+                </div>
             </div>
-        </div>
-    </div>
-    </div>
+             </div>
                     
                 `;
                 generaQrConLogo(mascota.identificador_qr, '/public/images/logo2.png');
@@ -284,6 +309,7 @@
             } else {
                 mascotaDetalles.innerHTML = '<p class="text-danger text-center">No se pudo cargar la información de la mascota.</p>';
             }
+            
 
             function generaQrConLogo(identificador_qr, logoUrl) {
                 const qrCode = new QRCodeStyling({
@@ -460,6 +486,18 @@
 
         });
 
+        function mostrarImagenAmpliada(imagenSrc, nombre) {
+                // Actualizar el src de la imagen en el modal
+                document.getElementById('imagenAmpliada').src = imagenSrc;
+                document.getElementById('imagenAmpliada').alt = nombre;
+
+                // Actualizar el título del modal
+                document.getElementById('imagenModalLabel').textContent = nombre;
+
+                // Mostrar el modal
+                var imagenModal = new bootstrap.Modal(document.getElementById('imagenModal'));
+                imagenModal.show();
+            }
 
         function cargarEspecies(especieIdSeleccionada) {
             fetch('/mis-mascotas/especies')
