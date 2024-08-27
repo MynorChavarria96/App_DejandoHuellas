@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css">
   <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
   <style>
     form input[type=date] {
@@ -195,12 +194,14 @@
             </div>
             <div class="row">
               <h3><strong> Dirección de vivienda</strong></h3>
-              <p>Esta información es indispensable para ubicar mas fácil la direccion de residencia de la mascota en caso de que se pierda.</p>
+              <p>Esta información es indispensable para ubicar mas fácil la direccion de residencia de la mascota en
+                caso de que se pierda.</p>
               <div class="col-md-2">
                 <button type="button" onclick="sendLocation()" class="btn btn-primary">Mi ubicación actual</button>
               </div>
               <div class="col-md-3">
-                <button type="button" onclick="toggleManualLocation()" class="btn btn-primary">Elegir ubicación manual</button>
+                <button type="button" onclick="toggleManualLocation()" class="btn btn-primary">Elegir ubicación
+                  manual</button>
               </div>
             </div>
             <!-- Contenedor para mostrar la información de ubicación -->
@@ -228,7 +229,7 @@
     </div>
   </div>
 
-
+  <script src="/public/js/misMascotas.js"></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -242,6 +243,9 @@
   <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.3/dist/heic2any.min.js"></script>
 
   <script>
+    const propietario_Id = <%= propietarioId %>;
+</script>
+  <!-- <script>
     document.addEventListener('DOMContentLoaded', function () {
       const radioSi = document.getElementById('exampleRadios1');
       const radioNo = document.getElementById('exampleRadios2');
@@ -249,6 +253,7 @@
       const btnAgregar = document.getElementById('btn-agregar');
       const btnGuardar = document.getElementById('btn-guardar');
       const btnCerrar = document.getElementById('btn-cerrar');
+
 
       initializeMap();
       loadSavedLocations();
@@ -264,6 +269,8 @@
 
         resetFormAndMap();
       });
+
+
 
       btnGuardar.addEventListener('click', async (event) => {
         event.preventDefault();
@@ -376,6 +383,7 @@
     const guatemalaCoords = [14.6349, -90.5069]; // Coordenadas centrales de Guatemala
 
     function sendLocation() {
+      resetFormAndMap();
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition, showError);
       } else {
@@ -383,6 +391,7 @@
       }
     }
     function toggleManualLocation() {
+      resetFormAndMap();
       const locationInfo = document.getElementById('locationInfo');
       if (locationInfo.style.display === 'none') {
         locationInfo.style.display = 'block';
@@ -414,7 +423,7 @@
             // Crear el marcador y agregarlo al mapa
             manualMarker = L.marker(e.latlng).addTo(manualMap);
 
-            
+
             const placeName = prompt("Ingresa el nombre del lugar:");
             if (placeName) {
               // Vincular un popup con el nombre del lugar al marcador
@@ -422,9 +431,22 @@
               // Solicitar al usuario que ingrese el nombre del lugar
               const descripcion = prompt("Ingresa una descripcion más precisa del lugar:");
               manualMarker.bindPopup(`<strong>${placeName}</strong><br>${descripcion}`).openPopup();
+
+
+              // Escuchar el evento popupclose para ejecutar una acción cuando se cierre el popup
+              manualMarker.on('popupclose', function () {
+                console.log("El popup de 'Ubicación Manual' se ha cerrado.");
+                // Aquí puedes agregar cualquier acción que desees ejecutar cuando se cierre el popup
+                resetFormAndMap();
+              });
+
+
+
               // Guardar la ubicación y el nombre en el localStorage
               saveManualLocation(e.latlng.lat, e.latlng.lng, placeName, descripcion);
             }
+
+
           }
         });
       } else {
@@ -434,22 +456,22 @@
       }
     }
     function showPosition(position) {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
 
-    // Solicitar al usuario que ingrese el nombre del lugar
-    const placeName = prompt("Ingresa el nombre del lugar para tu ubicación actual:");
+      // Solicitar al usuario que ingrese el nombre del lugar
+      const placeName = prompt("Ingresa el nombre del lugar para tu ubicación actual:");
 
-    // Solicitar al usuario que ingrese una descripción del lugar
-    const description = prompt("Ingresa una descripción para tu ubicación actual:");
+      // Solicitar al usuario que ingrese una descripción del lugar
+      const description = prompt("Ingresa una descripción para tu ubicación actual:");
 
-    if (placeName && description) {
+      if (placeName && description) {
         // Crear un objeto con las coordenadas, nombre del lugar y descripción
         const locationData = {
-            latitude: latitude,
-            longitude: longitude,
-            name: placeName,
-            description: description
+          latitude: latitude,
+          longitude: longitude,
+          name: placeName,
+          description: description
         };
 
         // Guardar en localStorage
@@ -469,10 +491,14 @@
 
         // Añadir un marcador al mapa con un popup que muestra nombre y descripción
         if (manualMarker) {
-            manualMap.removeLayer(manualMarker);
+          manualMap.removeLayer(manualMarker);
         }
         manualMarker = L.marker([latitude, longitude]).addTo(manualMap);
         manualMarker.bindPopup(`<strong>${placeName}</strong><br>${description}`).openPopup();
+
+        manualMarker.on('popupclose', function () {
+          resetFormAndMap();
+        });
 
         // Deshabilitar el campo de búsqueda y botón
         document.getElementById('locationSearch').disabled = true;
@@ -486,10 +512,10 @@
         //     },
         //     body: JSON.stringify(locationData)
         // });
-    } else {
+      } else {
         alert("Se requiere ingresar un nombre y una descripción para la ubicación.");
+      }
     }
-}
 
 
     function showError(error) {
@@ -509,32 +535,33 @@
       }
     }
     function resetFormAndMap() {
-      // Resetea todos los campos del formulario
-      document.getElementById('regForm').reset();
-
-      // Restablece la imagen de vista previa a la predeterminada
-      document.getElementById('previewImage').src = '/public/images/default.jpg';
-
-      // Limpia el campo de búsqueda de ubicación
-      document.getElementById('locationSearch').value = '';
-
       // Oculta el contenedor de información de ubicación
       const locationInfo = document.getElementById('locationInfo');
       locationInfo.style.display = 'none';
-
-      // Elimina el marcador del mapa si existe
+      // Eliminar marcador si existe
       if (manualMarker) {
         manualMap.removeLayer(manualMarker);
         manualMarker = null;
       }
 
-      // Reajusta la vista del mapa a las coordenadas iniciales si es necesario
-      if (manualMap) {
-        manualMap.setView(guatemalaCoords, 13);
+      // Resetear el mapa a la vista inicial (centro en Guatemala)
+      manualMap.setView(guatemalaCoords, 7);
+
+      // Limpiar campos de búsqueda y habilitarlos
+      document.getElementById('locationSearch').value = '';
+      document.getElementById('locationSearch').disabled = false;
+      document.querySelector("button[onclick='searchLocation()']").disabled = false;
+
+      // Limpiar `localStorage` si es necesario
+      // Si deseas mantener la funcionalidad de guardar en `localStorage`,
+      // comenta o ajusta esta línea según sea necesario
+      localStorage.removeItem('locations');
+
+      // Ocultar el popup si está abierto
+      if (manualMarker) {
+        manualMarker.closePopup();
       }
 
-      // Limpia los datos de localStorage si es necesario
-      localStorage.removeItem('locations');
     }
 
     function searchLocation() {
@@ -568,6 +595,7 @@
         name: name,
         descripcion: descripcion
       };
+
       // Obtiene las ubicaciones almacenadas previamente o inicializa una nueva lista
       const locations = JSON.parse(localStorage.getItem('locations')) || [];
       locations.push(locationData);
@@ -575,7 +603,7 @@
       // Guarda la lista actualizada de ubicaciones en localStorage
       localStorage.setItem('locations', JSON.stringify(locations));
 
-      console.log("Ubicación guardada:", locationData); // Mostrar en consola para verificación
+      console.log(locationData); // Mostrar en consola para verificación
 
       // // Enviar al servidor, no llamar a addLocationToPage aquí
       // fetch('/api/location', {
@@ -709,7 +737,7 @@
           mascotasTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error al cargar las mascotas.</td></tr>';
         });
     }
-  </script>
+  </script> -->
 </body>
 
 </html>

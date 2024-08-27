@@ -67,7 +67,7 @@ exports.registrarMascota = async (req, res) => {
     const result = await response.json();
 
     if (response.ok) {
-      res.status(200).json({ message: 'Mascota registrada con éxito' });
+      res.status(200).json({ message: 'Mascota registrada con éxito', resulta: result });
     } else {
       res.status(400).json({ message: result.message || 'Error al registrar mascota' });
     }
