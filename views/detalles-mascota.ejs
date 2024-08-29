@@ -8,6 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         form input[type=date] {
             width: 100% !important;
@@ -22,27 +23,124 @@
             height: 46px !important;
         }
 
+        .previewImage {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .modal-content {
             max-width: 1220px !important;
         }
 
-        .img-fluid {
-            max-width: 100%;
-            height: auto;
+        .modal-content img {
+            max-height: 150% !important;
         }
+
+        .img-fluid {
+            border: 1px solid black;
+        }
+
 
         .mascota-foto img {
-            max-width: 300px;
-            height: auto;
+            position: relative;
+            width: 80%;
+            height: 400px;
             display: block;
             margin: 0 auto;
-            border-radius: 50%;
+            border-radius: 10px;
+            cursor: pointer;
+            object-fit: cover;
+            /* Ajusta la imagen para que cubra el espacio sin deformarse */
         }
 
-        @media (min-width: 768px) {
+        .map {
+            height: 300px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .modal-map {
+            height: 300px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .leaflet-popup-close-button {
+            display: none;
+            /* Oculta el botón de cerrar del popup */
+        }
+
+        .mascota-foto {
+            position: relative;
+        }
+
+        #preview {
+            cursor: zoom-in;
+            /* Indica que se puede hacer zoom */
+        }
+
+        .zoomed-image {
+            position: absolute;
+            top: 0;
+            left: 100%;
+            width: 500px;
+            height: 400px;
+            border: 1px solid #ccc;
+            background-repeat: no-repeat;
+            background-size: 200%;
+            display: none;
+            z-index: 100;
+
+        }
+
+
+        #map {
+            height: 400px;
+            width: 100%;
+        }
+
+        .modal-lg-custom {
+            max-width: 80%;
+        }
+
+        @media (max-width: 768px) {
             .modal-lg-custom {
-                max-width: 80%;
+                max-width: 100%;
             }
+
+            .mascota-foto img {
+                width: 100%;
+                /* Hace que la imagen ocupe todo el ancho del contenedor en móviles */
+                height: auto;
+                /* Mantiene la proporción de la imagen */
+                padding: 0;
+                /* Elimina cualquier padding */
+                margin: 0;
+                /* Elimina cualquier margen */
+                border-radius: 0;
+                /* Opcional: elimina el borde redondeado en móviles */
+            }
+
+            .mascota-foto {
+                padding: 0;
+                /* Elimina el padding del contenedor de la imagen */
+                margin: 0;
+                /* Elimina el margen del contenedor de la imagen */
+            }
+
+
+            #preview {
+                cursor: default;
+                ;
+                /* Desactiva la interactividad (zoom) en móviles */
+            }
+
+            #zoomedImage {
+                display: none;
+                /* Oculta la imagen ampliada en dispositivos móviles */
+            }
+
         }
     </style>
 </head>
@@ -59,6 +157,13 @@
             <div class="card-body px-md-5 px-lg-6">
                 <div id="mascotaDetalles" class="row">
                     <!-- Los detalles de la mascota se cargarán aquí -->
+                </div>
+                <div class="col md-12 text-center mt-2">
+                    <h2>Lugar de residencia</h2>
+                </div>
+
+                <div class="col md-12">
+                    <div id="map" class="map"></div>
                 </div>
             </div>
         </div>
@@ -159,6 +264,27 @@
                                     class="img-fluid rounded mx-auto d-block" alt="...">
                             </div>
                         </div>
+                        <div class="row">
+                            <h3><strong> Dirección de vivienda</strong></h3>
+                            <p>Esta información es indispensable para ubicar mas fácil la direccion de residencia de la
+                                mascota en
+                                caso de que se pierda.</p>
+                        </div>
+                        <!-- Contenedor para mostrar la información de ubicación -->
+                        <div class="row mt-3" id="locationInfo">
+
+                            <div class="col-md-6">
+                                <label for="locationSearch">Buscar lugar:</label>
+                                <input type="text" id="locationSearch" class="form-control"
+                                    placeholder="Ingresa el nombre del lugar">
+                                <button type="button" onclick="searchLocation()"
+                                    class="btn btn-primary mt-2 search">Buscar</button>
+                                <p>Para seleccionar tu ubicación, toca dos veces en el mapa.</p>
+                            </div>
+                            <div class="col-md-12">
+                                <div id="modal-map" class="modal-map"></div>
+                            </div>
+                        </div>
                         <div class="row justify-content-center">
                             <div class="col-12 col-md-2">
                                 <button type="button" id="btn-actualizar"
@@ -173,14 +299,14 @@
 
     <!-- Modal ver Foto -->
     <div class="modal fade" id="imagenModal" tabindex="-1" aria-labelledby="imagenModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-dialog modal-dialog-centered  modal-lg-custom">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="imagenModalLabel"></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <img src="" alt="" id="imagenAmpliada" class="img-fluid">
+                    <img src="" alt="" id="imagenAmpliada" class="img-fluid" style="width: 150%; height: 150%;">
                 </div>
             </div>
         </div>
@@ -191,8 +317,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
     <script>
+
+
+
         document.addEventListener('DOMContentLoaded', () => {
             const mascotaDetalles = document.getElementById('mascotaDetalles');
             const radioSi = document.getElementById('exampleRadios1');
@@ -200,10 +330,12 @@
             const enfermedadInput = document.getElementById('enfermedad_cronica');
             const btnActualizar = document.getElementById('btn-actualizar');
             const tunel_LocalHost = "<%= tunel_LocalHost %>";
-
-            // Recuperar la información de la mascota desde sessionStorage
             const mascota = JSON.parse(sessionStorage.getItem('mascotaSeleccionada'));
-            // Función para habilitar o deshabilitar el campo de entrada
+
+
+            let modalMap;
+            let modalMarker;
+
             function toggleEnfermedadInput() {
                 if (radioSi.checked) {
                     enfermedadInput.disabled = false;
@@ -243,6 +375,7 @@
             }
 
 
+
             // Función para formatear la fecha en formato YYYY-MM-DD
             function formatearFecha(fecha) {
                 const fechaObj = new Date(fecha);
@@ -253,9 +386,11 @@
             }
 
             if (mascota) {
+
                 mascotaDetalles.innerHTML = `
                     <div class="col-md-4 mx-auto d-flex justify-content-center align-items-center mascota-foto">
-                    <img src="${mascota.foto}" alt="${mascota.nombre}" class="img-fluid" onclick="mostrarImagenAmpliada('${mascota.foto}', '${mascota.nombre}')">
+                    <img src="${mascota.foto}" alt="${mascota.nombre}" class="img-fluid" id="preview" onclick="mostrarImagenAmpliada('${mascota.foto}', '${mascota.nombre}')">
+                    <div id="zoomedImage" class="zoomed-image"></div>
                     </div>
                     <div class="col-md-4 d-flex align-items-center">
                         <div class="w-100">
@@ -285,6 +420,26 @@
              </div>
                     
                 `;
+
+                // Convertir latitud y longitud a números
+                const latitud = parseFloat(mascota.latitud);
+                const longitud = parseFloat(mascota.longitud);
+
+                // Inicializar el mapa centrado en las coordenadas de la mascota
+                const map = L.map('map').setView([latitud, longitud], 15); // El número 15 es el nivel de zoom
+
+
+                // Agregar los mosaicos de OpenStreetMap
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                // Agregar un marcador en las coordenadas de la mascota
+                const marker = L.marker([latitud, longitud]).addTo(map);
+
+                // Vincular un popup al marcador con el nombre y la descripción del lugar
+                marker.bindPopup(`<strong>${mascota.nombre_lugar}</strong><br>${mascota.descripcion_lugar}`).openPopup();
+
                 generaQrConLogo(mascota.identificador_qr, '/public/images/logo2.png');
                 // Añadir el evento de click para descargar el QR
                 document.getElementById('downloadQr').addEventListener('click', function () {
@@ -302,14 +457,183 @@
                     document.getElementById('enfermedad_cronica').value = mascota.enfermedad_cronica;
                     document.getElementById('previewImage').src = mascota.foto;
 
+                    // Convertir latitud y longitud a números
+                    const latitud = parseFloat(mascota.latitud);
+                    const longitud = parseFloat(mascota.longitud);
+
+
                     // Cargar y seleccionar especies y géneros
                     cargarEspecies(mascota.especie_id);
                     cargarGeneros(mascota.genero_id);
+
+                    const modal = new bootstrap.Modal(document.getElementById('registroModal'));
+                    modal.show();
+                    // Configurar el evento click del botón de búsqueda
+                    const searchButton = document.querySelector('.btn-primary.mt-2'); // Asegúrate de que este selector coincida con tu botón de búsqueda
+                    if (searchButton) {
+                        searchButton.addEventListener('click', searchLocation);
+                    }
+
+                    // Configurar el evento 'shown.bs.modal' para inicializar el mapa
+                    $('#registroModal').off('shown.bs.modal').on('shown.bs.modal', function () {
+                        initializeOrUpdateModalMap(latitud, longitud, mascota.nombre_lugar, mascota.descripcion_lugar);
+                    });
+
+                    // Configurar el evento 'hidden.bs.modal' para eliminar el fondo modal residual
+                    $('#registroModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+                        $('.modal-backdrop').remove(); // Elimina cualquier fondo modal que quede
+                    });
                 });
             } else {
                 mascotaDetalles.innerHTML = '<p class="text-danger text-center">No se pudo cargar la información de la mascota.</p>';
             }
-            
+
+
+            // Variables globales para latitud, longitud, nombre y descripción
+            let latitude, longitude, placeName, description;
+
+            function initializeOrUpdateModalMap(latitud, longitud, nombre_lugar, descripcion_lugar) {
+                if (!modalMap) {
+                    // Si el mapa no ha sido creado aún, inicialízalo
+                    modalMap = L.map('modal-map').setView([latitud, longitud], 15);
+
+                    // Agregar los mosaicos de OpenStreetMap
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(modalMap);
+
+                    // Escuchar el evento de doble clic en el mapa
+                    modalMap.on('dblclick', function (e) {
+                        // Guardar la información anterior
+                        const previousLatLng = modalMarker ? modalMarker.getLatLng() : null;
+                        const previousName = placeName;
+                        const previousDescription = description;
+
+                        // Obtener las coordenadas donde se hizo doble clic
+                        const coords = e.latlng;
+
+                        // Eliminar el marcador existente si hay uno
+                        if (modalMarker) {
+                            modalMap.removeLayer(modalMarker);
+                        }
+
+                        // Crear un nuevo marcador en las coordenadas de doble clic
+                        modalMarker = L.marker([coords.lat, coords.lng]).addTo(modalMap);
+                        latitude = coords.lat;
+                        longitude = coords.lng;
+
+                        // Solicitar al usuario el nombre y la descripción del lugar
+                        const newName = prompt("Ingrese el nombre del lugar:", previousName);
+                        const newDescription = prompt("Ingrese la descripción del lugar:", previousDescription);
+
+                        // Verificar si el usuario canceló alguno de los prompts
+                        if (newName === null || newDescription === null) {
+                            // Si el usuario cancela, restablecer la información anterior
+                            if (previousLatLng) {
+                                modalMarker.setLatLng(previousLatLng);
+                                modalMarker.bindPopup(`<strong>${previousName}</strong><br>${previousDescription}`).openPopup();
+                            } else {
+                                modalMap.removeLayer(modalMarker); // Si no hay información previa, simplemente remueve el marcador
+                                modalMarker = null;
+                            }
+                        } else {
+                            // Actualizar la información y vincular el popup al marcador
+                            placeName = newName;
+                            description = newDescription;
+                            modalMarker.bindPopup(`<strong>${placeName}</strong><br>${description}`).openPopup();
+                        }
+                    });
+
+                } else {
+                    // Si el mapa ya existe, invalida su tamaño y recéntralo
+                    modalMap.invalidateSize();
+                    modalMap.setView([latitud, longitud], 15);
+
+                    // Si ya existe un marcador, elimínalo para evitar múltiples marcadores
+                    if (modalMarker) {
+                        modalMap.removeLayer(modalMarker);
+                    }
+
+                    // Agregar un marcador en las coordenadas iniciales
+                    modalMarker = L.marker([latitud, longitud]).addTo(modalMap);
+
+                    // Vincular un popup al marcador con el nombre y la descripción del lugar
+                    modalMarker.bindPopup(`<strong>${nombre_lugar}</strong><br>${descripcion_lugar}`).openPopup();
+
+                    // Actualizar las variables globales
+                    latitude = latitud;
+                    longitude = longitud;
+                    placeName = nombre_lugar;
+                    description = descripcion_lugar;
+
+
+                }
+            }
+            function searchLocation() {
+                const locationName = document.getElementById('locationSearch').value;
+                if (locationName) {
+                    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationName)}`;
+                    fetch(url)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                const { lat, lon } = data[0];
+
+                                // Asegúrate de que modalMap esté inicializado
+                                if (modalMap) {
+                                    // Centrar el mapa en la nueva ubicación
+                                    modalMap.setView([lat, lon], 13);
+
+                                    // Eliminar el marcador existente si hay uno
+                                    if (modalMarker) {
+                                        modalMap.removeLayer(modalMarker);
+                                    }
+
+                                    // Crear un nuevo marcador en la ubicación encontrada
+                                    modalMarker = L.marker([lat, lon]).addTo(modalMap);
+                                    modalMarker.bindPopup(`<strong>${locationName}</strong>`).openPopup();
+
+                                    // Actualizar las variables globales con la nueva ubicación
+                                    latitude = parseFloat(lat);
+                                    longitude = parseFloat(lon);
+                                    placeName = locationName;
+                                    description = ''; // O pide al usuario ingresar una descripción si es necesario
+                                } else {
+                                    console.error("modalMap no está inicializado.");
+                                    alert("El mapa no está inicializado.");
+                                }
+                            } else {
+                                alert("No se encontró la ubicación. Inténtalo de nuevo.");
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error al buscar la ubicación:', error);
+                            alert("Ocurrió un error al buscar la ubicación.");
+                        });
+                } else {
+                    alert("Por favor, ingresa el nombre de un lugar para buscar.");
+                }
+            }
+
+            document.getElementById('preview').addEventListener('mousemove', function (e) {
+                var zoomedImage = document.getElementById('zoomedImage');
+                zoomedImage.style.display = 'block';
+
+                var rect = e.target.getBoundingClientRect();
+                var x = e.clientX - rect.left; // Coordenada X del mouse respecto a la imagen
+                var y = e.clientY - rect.top; // Coordenada Y del mouse respecto a la imagen
+                var width = e.target.width;
+                var height = e.target.height;
+                var bgPosX = (x / width) * 100;
+                var bgPosY = (y / height) * 100;
+
+                zoomedImage.style.backgroundImage = 'url(' + e.target.src + ')';
+                zoomedImage.style.backgroundPosition = bgPosX + '% ' + bgPosY + '%';
+            });
+            document.getElementById('preview').addEventListener('mouseleave', function () {
+                var zoomedImage = document.getElementById('zoomedImage');
+                zoomedImage.style.display = 'none';
+            });
 
             function generaQrConLogo(identificador_qr, logoUrl) {
                 const qrCode = new QRCodeStyling({
@@ -378,8 +702,12 @@
                     peso: document.getElementById('peso').value,
                     foto: localPath,
                     enfermedad_cronica: document.getElementById('enfermedad_cronica').value,
-                    propietario_id: <%= propietarioId %> // Usar el propietarioId desde la sesión
-    };
+                    propietario_id: <%= propietarioId %> ,// Usar el propietarioId desde la sesión
+                    nombreUbicacion: placeName,
+                    latitud: latitude,
+                    longitud: longitude,
+                    descripcion_adicional: description
+            };
 
             // Extraer el mascota_id para usarlo en la URL
             const mascota_id = mascota.mascota_id;
@@ -424,6 +752,8 @@
                 toastr.error('Error de conexión con la API');
             }
         });
+
+
         const btnEliminar = document.getElementById('btn-eliminar');
 
         btnEliminar.addEventListener('click', async (event) => {
@@ -487,17 +817,17 @@
         });
 
         function mostrarImagenAmpliada(imagenSrc, nombre) {
-                // Actualizar el src de la imagen en el modal
-                document.getElementById('imagenAmpliada').src = imagenSrc;
-                document.getElementById('imagenAmpliada').alt = nombre;
+            // Actualizar el src de la imagen en el modal
+            document.getElementById('imagenAmpliada').src = imagenSrc;
+            document.getElementById('imagenAmpliada').alt = nombre;
 
-                // Actualizar el título del modal
-                document.getElementById('imagenModalLabel').textContent = nombre;
+            // Actualizar el título del modal
+            document.getElementById('imagenModalLabel').textContent = nombre;
 
-                // Mostrar el modal
-                var imagenModal = new bootstrap.Modal(document.getElementById('imagenModal'));
-                imagenModal.show();
-            }
+            // Mostrar el modal
+            var imagenModal = new bootstrap.Modal(document.getElementById('imagenModal'));
+            imagenModal.show();
+        }
 
         function cargarEspecies(especieIdSeleccionada) {
             fetch('/mis-mascotas/especies')
@@ -536,6 +866,7 @@
                 })
                 .catch(error => console.error('Error al cargar los generos:', error));
         }
+
         async function uploadImage(event) {
             const fileInput = event.target;
             const formData = new FormData();

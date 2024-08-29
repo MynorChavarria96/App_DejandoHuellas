@@ -218,7 +218,6 @@ function initializeMap() {
                     description = prompt("Ingresa una descripcion más precisa del lugar:"); // Asignar descripción global
                     manualMarker.bindPopup(`<strong>${placeName}</strong><br>${description}`).openPopup();
                     manualMarker.on('popupclose', function () {
-                        console.log("El popup de 'Ubicación Manual' se ha cerrado.");
                         resetFormAndMap();
                     });
                     saveManualLocation(latitude, longitude, placeName, description);
