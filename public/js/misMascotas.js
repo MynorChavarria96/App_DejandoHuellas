@@ -166,7 +166,7 @@ function cargarMascotas() {
         .catch(error => {
             console.error('Error al cargar las mascotas:', error);
             const mascotasTableBody = document.getElementById('mascotasTableBody');
-            mascotasTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">Error al cargar las mascotas.</td></tr>';
+            mascotasTableBody.innerHTML = '<tr><td colspan="9" class="text-center text-danger">No se encontraron mascotas.</td></tr>';
         });
 }
 
