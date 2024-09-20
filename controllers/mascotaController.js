@@ -55,6 +55,7 @@ exports.misMascotas = async (req, res) => {
 
 
 
+
 exports.registrarMascota = async (req, res) => {
   try {
     // Enviar los datos a la API

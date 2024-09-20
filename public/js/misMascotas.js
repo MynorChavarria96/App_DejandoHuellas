@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (response.ok) {
                 const result = await response.json();
-                console.log(result)
+ 
                 toastr.success('Mascota registrada exitosamente');
                   const modalElement = document.getElementById('registroModal');
                   const modal = bootstrap.Modal.getInstance(modalElement);

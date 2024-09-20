@@ -194,6 +194,7 @@
                             <p class="text-large"><strong>Enfermedad Crónica:</strong> <span
                                     id="enfermedad_cronica"></span></p>
 
+
                         </div>
 
                     </div>
@@ -227,7 +228,8 @@
                             </span>
                             Whatsapp
                         </a>
-                        <a id="contact-map" data-bs-toggle="modal" data-bs-target="#ReporteAparicion">
+                        <a id="contact-map" data-bs-toggle="modal" data-bs-target="#ReporteAparicion"
+                            onclick="inicializarCalendario()">
                             <span class="icon-space">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -279,23 +281,24 @@
 
                         <h4>Contáctame</h4>
                         <div class="row mb-3">
+
                             <div class="col-md-3">
                                 <label for="fecha_reporte" class="form-label">Fecha del Reporte</label>
                                 <input type="date" class="form-control" id="fecha_reporta" name="fecha_reporta"
                                     required>
-                               
+
                             </div>
                             <div class="col-md-3">
                                 <label for="telefono_reporta" class="form-label">Teléfono</label>
                                 <input type="tel" class="form-control" id="telefono_reporta" name="telefono_reporta"
                                     placeholder="Tu teléfono" pattern="[0-9]{8}" required>
-                        
+
                             </div>
                             <div class="col-md-6">
                                 <label for="correo_reporta" class="form-label">Correo</label>
                                 <input type="email" class="form-control" id="correo_reporta" name="correo_reporta"
                                     placeholder="Tu correo" required>
-                           
+
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -303,8 +306,8 @@
                                 <label for="nombre_reporta" class="form-label">Nombre</label>
                                 <input type="text" class="form-control" id="nombre_reporta" name="nombre_reporta"
                                     placeholder="Tu nombre" required>
-                           
                             </div>
+
 
                         </div>
 
@@ -367,48 +370,94 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
 
-            
-       
+
+
         document.addEventListener('DOMContentLoaded', function () {
             const identificador_qr = window.location.pathname.split('/').pop();
             const spinner = document.getElementById('loading-spinner');
             const card = document.querySelector('.card');
             const btnCerrar = document.getElementById('btn-cerrar');
             const btnEnviar = document.getElementById('btn-enviar');
- 
+            let mascota;
+
+
+
             initializeMap();
             loadSavedLocations();
-            inicializarCalendario();
 
             btnCerrar.addEventListener('click', () => {
                 resetFormAndMap();
 
             });
 
-         
-            btnEnviar.addEventListener('click', () => {
+
+            btnEnviar.addEventListener('click', async () => {
+
                 event.preventDefault();
-            if (placeName && latitude && longitude) {
-
-                const formData = {
-                    nombre_reporta: document.getElementById('nombre_reporta').value,
-                    correo_reporta: document.getElementById('correo_reporta').value,
-                    fecha_reporta: document.getElementById('fecha_reporta').value,
-                    telefono_reporta: document.getElementById('telefono_reporta').value,
-                    nombreUbicacion: placeName,
-                    latitud: latitude,
-                    longitud: longitude,
-                    descripcion_adicional: document.getElementById('informacion_reporta').value
-                };
-
-                console.log(formData);
+                const nombre_reporta = document.getElementById('nombre_reporta').value;
+                const correo_reporta = document.getElementById('correo_reporta').value;
+                const fecha_reporta = document.getElementById('fecha_reporta').value;
+                const telefono_reporta = document.getElementById('telefono_reporta').value;
+                const informacion_reporta = document.getElementById('informacion_reporta').value;
 
 
-            } else {
-                toastr.error('Por favor, seleccione la ubicación.');
-            }
-        
-    });
+
+                if (placeName && latitude && longitude && description) {
+
+                    const formDataDemografico = {
+                        nombreUbicacion: placeName,
+                        descripcionUbicacion: description,
+                        latitud: latitude,
+                        longitud: longitude
+                    }
+                    if (nombre_reporta && correo_reporta && fecha_reporta && telefono_reporta) {
+                        const formData = {
+                            nombre_reporta,
+                            correo_reporta,
+                            fecha_reporta,
+                            telefono_reporta,
+                            descripcion_adicional: informacion_reporta,
+                            mascota_id: mascota.mascota_id
+                        };
+                        try {
+                            const response = await fetch('reporte', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(formData)
+                            });
+
+
+                            if (response.ok) {
+                                const result = await response.json();
+                                toastr.success("Reporte enviado")
+                                setTimeout(() => {
+                                    const modalElement = document.getElementById('ReporteAparicion');
+                                    const modal = bootstrap.Modal.getInstance(modalElement);
+                                    modal.hide();
+                                    document.getElementById('regForm').reset();
+                                    document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+                                    resetFormAndMap();
+                                }, 1500);
+
+                            } else {
+                                const errorResult = await response.json();
+                                toastr.error('Error al registrar la mascota: ' + errorResult.message);
+                            }
+                        } catch (error) {
+                            toastr.error('Error de conexión con la API', error);
+                        }
+
+                    }
+                    else {
+                        toastr.error('¡Los datos de nombre, correo, fecha y teléfono son obligatorios!');
+                    }
+
+
+                } else {
+                    toastr.error('¡Por favor, seleccione la ubicación.!');
+                }
+
+            });
             // Mostrar el spinner y ocultar la tarjeta
             spinner.style.display = 'block';
             card.style.display = 'none';
@@ -420,7 +469,7 @@
                     return response.json();
                 })
                 .then(data => {
-                    const mascota = data[0]; // Acceder a la primera posición del arreglo
+                    mascota = data[0]; // Acceder a la primera posición del arreglo
                     const mensaje = encodeURIComponent("Hola, me he encontrado con tu mascota. ");
                     if (mascota) {
                         const whatsappLink = `https://api.whatsapp.com/send/?phone=${mascota.telefono}&text=${mensaje}${mascota.nombre}`;
@@ -440,6 +489,7 @@
                         document.getElementById('enfermedad_cronica').textContent = mascota.enfermedad_cronica || 'N/A';
                         document.getElementById('propietario').textContent = mascota.propietario;
                         document.getElementById('contact-wa').href = whatsappLink;
+
                         // document.getElementById('correo').textContent = mascota.correo;
                         document.getElementById('foto').src = mascota.foto;
                         //console.log(mascota);
@@ -520,6 +570,7 @@
 
         function sendLocation() {
             resetFormAndMap();
+
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
             } else {
@@ -668,7 +719,7 @@
             const locations = JSON.parse(localStorage.getItem('locations')) || [];
             locations.push(locationData);
             localStorage.setItem('locations', JSON.stringify(locations));
-           // console.log(locationData);
+            // console.log(locationData);
         }
 
         function loadSavedLocations() {

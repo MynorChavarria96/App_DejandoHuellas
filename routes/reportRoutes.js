@@ -9,4 +9,6 @@ router.get('/:identificador_qr', reportController.infoQR);
 router.get('/qr/:identificador_qr', reportController.mascotaQR);
 
 
+router.post('/reporte', reportController.reporte);
+
 module.exports = router;

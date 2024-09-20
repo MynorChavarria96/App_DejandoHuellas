@@ -19,6 +19,7 @@ router.get('/mis-mascotas', mascotaController.misMascotas);
 
 
 
+
 // Ruta para procesar el formulario de registro de mascota
 router.post('/registrar', mascotaController.registrarMascota);
 router.put('/actualizar/:mascota_id', mascotaController.actualizarMascota);
