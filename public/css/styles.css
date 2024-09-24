@@ -90,6 +90,10 @@ h1 {
     max-height: 300px;
     margin: 0 auto;
 }
+.report-card {
+    position: relative; 
+    overflow: hidden; 
+}
 
 .report-card:hover {
     transform: scale(1.05);
@@ -105,13 +109,13 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    opacity: 0;
+    opacity: 1;
     transition: opacity 0.3s;
     pointer-events: none;
 }
 
 .report-card:hover .overlay {
-    opacity: 1;
+    opacity: 0;
 }
 
 .overlay-text {

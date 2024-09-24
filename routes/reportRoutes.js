@@ -10,5 +10,6 @@ router.get('/qr/:identificador_qr', reportController.mascotaQR);
 
 
 router.post('/reporte', reportController.reporte);
+router.get('/reporte/getReporteDes', reportController.getReporteDesaparecidos);
 
 module.exports = router;

@@ -40,3 +40,18 @@ exports.reporte = async (req, res) =>{
   }
 
 }
+exports.getReporteDesaparecidos = async (req, res) => {
+  try {
+      const response = await fetch('http://localhost:3000/api/get/reporteDes'); // Llama a la API externa
+      const reporteDes = await response.json();
+
+      if (!reporteDes || reporteDes.length === 0) {
+          return res.status(404).json({ message: 'No hay reportes de desaparecidos' });
+      }
+
+      res.json(reporteDes);
+  } catch (error) {
+      console.error(error); // Log del error en el servidor
+      res.status(500).json({ message: 'Error al obtener la información del reporte' });
+  }
+};

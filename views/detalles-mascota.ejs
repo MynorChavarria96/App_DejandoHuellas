@@ -410,17 +410,19 @@
                     </div>
                    <div class="col-md-4 d-flex justify-content-center align-items-center">
                  <div class="row">
-                <div class="col-12 d-flex justify-content-center" id="qrcode-${mascota.identificador_qr}">
+                <div class="col-12 d-flex  justify-content-center" id="qrcode-${mascota.identificador_qr}" onclick="window.location.href = '${tunel_LocalHost}info/${mascota.identificador_qr}'" style="cursor: pointer;">
                     <!-- Aquí va el código QR -->
                 </div>
                 <div class="col-12 col-md-8 mt-3 mx-auto d-flex justify-content-center">
                     <button id="downloadQr" class="btn btn-primary w-100 w-md-auto">Descargar QR</button>
                 </div>
-            </div>
-             </div>
+                    </div>
+                </div>
                     
                 `;
 
+             
+            
                 // Convertir latitud y longitud a números
                 const latitud = parseFloat(mascota.latitud);
                 const longitud = parseFloat(mascota.longitud);
@@ -445,6 +447,7 @@
                 document.getElementById('downloadQr').addEventListener('click', function () {
                     descargarQr(mascota.identificador_qr);
                 });
+              
 
                 // Agregar el evento click al botón de editar después de generar el contenido
                 document.querySelector('.btn-warning').addEventListener('click', () => {
@@ -487,8 +490,11 @@
             } else {
                 mascotaDetalles.innerHTML = '<p class="text-danger text-center">No se pudo cargar la información de la mascota.</p>';
             }
+            function clickQr(qr_code){
+                windows.location.href = `${tunel_LocalHost}/info/${mascota.identificador_qr}`
+            }
 
-
+          
             // Variables globales para latitud, longitud, nombre y descripción
             let latitude, longitude, placeName, description;
 
@@ -663,6 +669,9 @@
                     qrCode.download({ name: `QR-${identificador_qr}`, extension: "png" });
                 });
             }
+
+
+
             function descargarQr(identificador_qr) {
                 var qrContainerId = `qrcode-${identificador_qr}`;
                 var canvas = document.querySelector(`#${qrContainerId} canvas`);
@@ -752,6 +761,8 @@
                 toastr.error('Error de conexión con la API');
             }
         });
+
+        
 
 
         const btnEliminar = document.getElementById('btn-eliminar');

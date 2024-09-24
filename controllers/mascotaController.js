@@ -12,8 +12,8 @@ exports.showConsejos= (req, res) => {
 exports.showMisMascotas= (req, res) => {
   res.render('misMascotas');
 };
-exports.showEncontrados= (req, res) => {
-  res.render('encontrados');
+exports.showreportesMascotas= (req, res) => {
+  res.render('reportes');
 };
 exports.showDetalles= (req, res) => {
   res.render('detalles-mascota', {tunel_LocalHost: process.env.TUNEL_LOCALHOST});

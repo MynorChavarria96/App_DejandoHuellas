@@ -74,6 +74,8 @@ app.post('/upload', upload.single('foto'), (req, res) => {
   res.json({ filePath: `/uploads/${req.file.filename}` });
 });
 
+
+
 // Rutas
 
 app.use('/mis-mascotas', mascotaRoutes);

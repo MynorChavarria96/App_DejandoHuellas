@@ -6,8 +6,8 @@ const mascotaController = require('../controllers/mascotaController');
 
 //vistas
 router.get('/', ensureAuthenticated, mascotaController.showIndex);
-//router.get('/perdidos', ensureAuthenticated, mascotaController.getReports);
-router.get('/encontrados', ensureAuthenticated, mascotaController.showEncontrados);
+
+router.get('/reportesMascotas', ensureAuthenticated, mascotaController.showreportesMascotas);
 router.get('/consejos', ensureAuthenticated, mascotaController.showConsejos);
 router.get('/mias-mascotas', ensureAuthenticated, mascotaController.showMisMascotas);
 router.get('/mias-mascotas/detalles/:id', ensureAuthenticated, mascotaController.showDetalles);
