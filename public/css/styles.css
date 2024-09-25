@@ -219,7 +219,7 @@ header {
 .user-section-desktop {
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
+    align-items: flex-start;
 }
 
 .user-section-desktop .user {
@@ -245,22 +245,31 @@ header {
 }
 
 .nav {
+    flex-grow: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0;
-}
+  }
 
 .nav-list {
-    list-style-type: none;
     display: flex;
-    gap: 1rem;
+    list-style: none;
+    gap: 20px;  /* Espacio entre los elementos de la lista */
 }
+
+
 
 .nav-list li a {
     text-decoration: none;
     color: #487B68;
 }
+
+.dropdown {
+    position: absolute; /* o fixed, dependiendo del contexto */
+    right: 0; /* Alineado al borde derecho */
+    padding-left: 50px; /* Este padding puede ajustarse según sea necesario */
+}
+
 
 .nav-list li a:hover {
     color: rgb(188, 154, 126);
