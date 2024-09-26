@@ -332,7 +332,7 @@
             const tunel_LocalHost = "<%= tunel_LocalHost %>";
             const mascota = JSON.parse(sessionStorage.getItem('mascotaSeleccionada'));
 
-
+            
             let modalMap;
             let modalMarker;
 
@@ -699,7 +699,6 @@
                 let fullPath = document.getElementById('previewImage').src;
                 let url = new URL(fullPath);
                 let localPath = url.pathname; // Esto te dará la ruta relativa sin el dominio //
-
                 // Crear el objeto formData
                 const formData = {
                     nombre: document.getElementById('nombre_mascota').value,
@@ -715,7 +714,8 @@
                     nombreUbicacion: placeName,
                     latitud: latitude,
                     longitud: longitude,
-                    descripcion_adicional: description
+                    descripcion_adicional: description,
+                    ubicacionId: mascota.ubicacion_id
             };
 
             // Extraer el mascota_id para usarlo en la URL
@@ -734,8 +734,6 @@
                     const result = await response.json();
                     toastr.success('Mascota actualizada exitosamente');
                     console.log('Respuesta de la API:', result);
-
-
 
                     // Esperar 3 segundos (3000 ms) antes de redirigir
                     setTimeout(() => {

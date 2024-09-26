@@ -98,7 +98,7 @@ exports.actualizarMascota = async (req, res) => {
       res.status(400).json({ message: result.message || 'Error al actualizar mascota' });
     }
   } catch (error) {
-    console.error('Error al actualizar la mascota:', error);
+   
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 };

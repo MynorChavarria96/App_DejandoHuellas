@@ -135,6 +135,7 @@ function cargarMascotas() {
                 mascotasTableBody.innerHTML = '<tr><td colspan="9" class="text-center">No tienes mascotas registradas.</td></tr>';
             } else {
                 data.forEach(mascota => {
+                  
                     const row = document.createElement('tr');
                     row.innerHTML = `
               <td><button class="btn btn-secondary btn-detalles" data-id="${mascota.mascota_id}">Detalles</button></td>
