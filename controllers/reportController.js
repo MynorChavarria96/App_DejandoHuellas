@@ -40,6 +40,28 @@ exports.reporte = async (req, res) =>{
   }
 
 }
+exports.reporteDesaparecidos = async (req, res) =>{
+  try {
+    
+    const response = await fetch('http://localhost:3000/api/nuevo/reporteDes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      res.status(200).json({ message: 'Reporte Creado', resulta: result });
+    } else {
+      res.status(400).json({ message: result.message || 'Error al crear reporte' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+
+}
+
 exports.getReporteDesaparecidos = async (req, res) => {
   try {
       const response = await fetch('http://localhost:3000/api/get/reporteDes'); // Llama a la API externa

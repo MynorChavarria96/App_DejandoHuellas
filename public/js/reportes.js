@@ -64,7 +64,7 @@ async function updateReports() {
 function showReport(codigo) {
     window.location.href = `${tunel_LocalHost}info/${codigo}`
 }
-function addReport(event) {
+async function addReport  (event) {
     event.preventDefault(); // Evitar el envío del formulario
 
     // Obtener los valores de los campos del formulario
@@ -75,22 +75,42 @@ function addReport(event) {
 
     if (placeName && latitude && longitude && description) {
 
-        const formDataDemografico = {
-            nombreUbicacion: placeName,
-            descripcionUbicacion: description,
-            latitud: latitude,
-            longitud: longitude
-        }
         if (mascotaId && fechaDesaparicion && horaDesaparicion && descripcion) {
             const formData = {
                 fecha_desaparicion: fechaDesaparicion,
                 hora_desaparicion: horaDesaparicion,
-                descripcion_desparicion: descripcion,
+                descripcion_desaparicion: descripcion,
                 mascotaid_desaparicion: mascotaId,
+                nombreUbicacion: placeName,
+                descripcionUbicacion: description,
+                latitud: latitude,
+                longitud: longitude,
+                mascotaid_desaparicion: mascotaId
             };
 
-            console.log(formDataDemografico);
-            console.log(formData);
+            try {
+                const response = await fetch('info/reporte/Des', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+
+                if (response.ok) {
+                    const result = await response.json();
+                    toastr.success("Reporte Creado")
+                    setTimeout(() => {
+                        closeModal();
+                        window.location.href='reportesMascotas'
+                    }, 1500);
+
+                } else {
+                    const errorResult = await response.json();
+                    toastr.error('Error al crear el reporte: ' + errorResult.message);
+                }
+            } catch (error) {
+                toastr.error('Error de conexión con la API', error);
+            }
         }
         else {
             toastr.error('¡Todos los campos son obligatorios!');
@@ -104,6 +124,11 @@ function addReport(event) {
     
     function closeModal() {
         document.getElementById('reportModal').style.display = 'none';
+        document.getElementById('reportForm').reset();
+        const fotoMascota = document.getElementById('fotoMascota');
+        fotoMascota.src = '';  // Limpiar la ruta de la imagen
+        fotoMascota.style.display = 'none';  // Ocultar la imagen
+
         resetFormAndMap();
 
     }
