@@ -1,7 +1,7 @@
 require('dotenv').config();
+
 const express = require('express');
 const http = require('http');
-const WebSocket = require('ws');
 const bodyParser = require('body-parser');
 const path = require('path');
 const expressLayouts = require('express-ejs-layouts');
@@ -19,9 +19,7 @@ const { ensureAuthenticated } = require('./middleware/auth');
 // Configurar Express
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
 
-// Configuración de multer para almacenar archivos
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'uploads/');
@@ -86,7 +84,8 @@ app.use('/', ensureAuthenticated, mascotaRoutes);
 // Ruta raíz para manejar redirección basada en autenticación
 app.get('/', (req, res) => {
   if (req.isAuthenticated()) {
-    res.redirect('/'); // Redirigir a una página autenticada, por ejemplo, el dashboard
+    res.redirect('/'); 
+
   } else {
     res.redirect('/users/login');
   }
@@ -97,8 +96,7 @@ app.get('/', ensureAuthenticated, (req, res) => {
   res.render('index'); // Asegúrate de tener una vista 'home.ejs'
 });
 
-// WebSockets
-require('./websocket')(wss);
+
 
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {

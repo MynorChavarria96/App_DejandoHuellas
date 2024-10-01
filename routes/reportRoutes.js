@@ -9,7 +9,7 @@ router.get('/:identificador_qr', reportController.infoQR);
 router.get('/qr/:identificador_qr', reportController.mascotaQR);
 
 
-router.post('/reporte', reportController.reporte);
+router.post('/reporte/Apa', reportController.reporteAparecidos);
 router.post('/reporte/Des', reportController.reporteDesaparecidos);
 router.get('/reporte/getReporteDes', reportController.getReporteDesaparecidos);
 

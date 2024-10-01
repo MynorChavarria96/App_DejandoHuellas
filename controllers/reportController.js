@@ -19,15 +19,15 @@ exports.mascotaQR = async (req, res) => {
   }
 };
 
-exports.reporte = async (req, res) =>{
+exports.reporteAparecidos = async (req, res) =>{
   try {
     
-    const response = await fetch('http://localhost:3000/api/nuevo/reporte', {
+    const response = await fetch('http://localhost:3000/api/nuevo/reporteApa', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
     });
-
+    
     const result = await response.json();
 
     if (response.ok) {
@@ -40,27 +40,34 @@ exports.reporte = async (req, res) =>{
   }
 
 }
-exports.reporteDesaparecidos = async (req, res) =>{
+exports.reporteDesaparecidos = async (req, res) => {
   try {
-    
     const response = await fetch('http://localhost:3000/api/nuevo/reporteDes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(req.body)
     });
 
-    const result = await response.json();
+    // Intentar parsear la respuesta
+    let result;
+    try {
+      result = await response.json();
+    } catch (jsonError) {
+      // Si la respuesta no es JSON válido
+      return res.status(502).json({ message: 'Error al interpretar la respuesta del servidor' });
+    }
 
     if (response.ok) {
       res.status(200).json({ message: 'Reporte Creado', resulta: result });
     } else {
-      res.status(400).json({ message: result.message || 'Error al crear reporte' });
+      // Manejo de errores específicos del servidor
+      res.status(response.status).json({ message: result.message || 'Error al crear reporte' });
     }
   } catch (error) {
-    res.status(500).json({ message: 'Error interno del servidor' });
+    // Si ocurre algún error durante la solicitud o al intentar contactar la API
+    res.status(500).json({ message: 'Error interno del servidor', error: error.message });
   }
-
-}
+};
 
 exports.getReporteDesaparecidos = async (req, res) => {
   try {

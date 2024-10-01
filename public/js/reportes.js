@@ -8,6 +8,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
+// Función para añadir un nuevo reporte al DOM
+function addNewReportToDOM(report) {
+    const reportsContainer = document.getElementById('reportsContainer');
+    if (!reportsContainer) {
+        console.error('El elemento con ID "reportsContainer" no se encontró en el DOM.');
+        return;
+    }
+
+    const reportCard = document.createElement('div');
+    const fecha_desaparicion = formatDate(new Date(report.fecha_desaparicion));
+    reportCard.className = 'report-card';
+    reportCard.innerHTML = `
+        <img src="${report.foto}" alt="${report.nombre}">
+        <h3>${report.nombre}</h3>
+        <h5>${report.raza}</h5>
+        <strong>Desapareció el:</strong>
+        <h2>${fecha_desaparicion} ${report.hora_desaparicion}</h2>
+        <div class="overlay">
+            <div class="overlay-text">Desaparecido</div>
+        </div>
+    `;
+    // Agrega un evento clic para mostrar los detalles del reporte
+    reportCard.onclick = () => showReport(report.identificador_qr);
+    reportsContainer.prepend(reportCard); // Agregar al inicio para que los nuevos aparezcan arriba
+}
+
+// Llamar a la función para cargar reportes desde la API
 async function updateReports() {
     const reportsContainer = document.getElementById('reportsContainer');
     if (!reportsContainer) {
@@ -15,7 +42,7 @@ async function updateReports() {
         return;
     }
 
-    reportsContainer.innerHTML = '';
+    reportsContainer.innerHTML = ''; // Limpiar contenedor
 
     try {
         const response = await fetch('info/reporte/getReporteDes');
@@ -24,7 +51,7 @@ async function updateReports() {
             throw new Error('Error al obtener los reportes: ' + response.statusText);
         }
 
-        reports = await response.json(); // Supone que la respuesta es en formato JSON
+        const reports = await response.json(); // Supone que la respuesta es en formato JSON
 
         // Verifica si no hay reportes
         if (reports.length === 0) {
@@ -34,32 +61,69 @@ async function updateReports() {
         } else {
             // Itera sobre cada reporte y crea una tarjeta
             reports.forEach(report => {
-                const reportCard = document.createElement('div');
-                const fecha_desaparicion = formatDate(new Date(report.fecha_desaparicion));
-                reportCard.className = 'report-card';
-                reportCard.innerHTML = `
-                    <img src="${report.foto}" alt="${report.nombre}">
-                    <h3>${report.nombre}</h3>
-                    <h5>${report.raza}</h5>
-                    <strong>Desapareció el:</strong>
-                    <h2>${fecha_desaparicion} ${report.hora_desaparicion}</h2>
-                    <div class="overlay">
-                        <div class="overlay-text">Desaparecido</div>
-                    </div>
-                `;
-                // Agrega un evento clic para mostrar los detalles del reporte
-                reportCard.onclick = () => showReport(report.identificador_qr);
-                //reportCard.onclick = () => showReportDetails(report);
-                reportsContainer.appendChild(reportCard);
+                addNewReportToDOM(report); // Utiliza la función para añadir reportes al DOM
             });
         }
     } catch (error) {
         console.error('Error:', error);
         const errorMessage = document.createElement('p');
-        errorMessage.textContent = 'No se pudieron cargar los reportes. Inténtalo más tarde.';
+        errorMessage.textContent = 'No hay reportes para mostrar';
         reportsContainer.appendChild(errorMessage);
     }
 }
+
+// async function updateReports() {
+//     const reportsContainer = document.getElementById('reportsContainer');
+//     if (!reportsContainer) {
+//         console.error('El elemento con ID "reportsContainer" no se encontró en el DOM.');
+//         return;
+//     }
+
+//     reportsContainer.innerHTML = '';
+
+//     try {
+//         const response = await fetch('info/reporte/getReporteDes');
+//         // Verifica si la respuesta es correcta (status 200-299)
+//         if (!response.ok) {
+//             throw new Error('Error al obtener los reportes: ' + response.statusText);
+//         }
+
+//         reports = await response.json(); // Supone que la respuesta es en formato JSON
+
+//         // Verifica si no hay reportes
+//         if (reports.length === 0) {
+//             const noReportsMessage = document.createElement('p');
+//             noReportsMessage.textContent = 'No hay reportes disponibles.';
+//             reportsContainer.appendChild(noReportsMessage);
+//         } else {
+//             // Itera sobre cada reporte y crea una tarjeta
+//             reports.forEach(report => {
+//                 const reportCard = document.createElement('div');
+//                 const fecha_desaparicion = formatDate(new Date(report.fecha_desaparicion));
+//                 reportCard.className = 'report-card';
+//                 reportCard.innerHTML = `
+//                     <img src="${report.foto}" alt="${report.nombre}">
+//                     <h3>${report.nombre}</h3>
+//                     <h5>${report.raza}</h5>
+//                     <strong>Desapareció el:</strong>
+//                     <h2>${fecha_desaparicion} ${report.hora_desaparicion}</h2>
+//                     <div class="overlay">
+//                         <div class="overlay-text">Desaparecido</div>
+//                     </div>
+//                 `;
+//                 // Agrega un evento clic para mostrar los detalles del reporte
+//                 reportCard.onclick = () => showReport(report.identificador_qr);
+//                 //reportCard.onclick = () => showReportDetails(report);
+//                 reportsContainer.appendChild(reportCard);
+//             });
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//         const errorMessage = document.createElement('p');
+//         errorMessage.textContent = 'No se pudieron cargar los reportes. Inténtalo más tarde.';
+//         reportsContainer.appendChild(errorMessage);
+//     }
+// }
 
 function showReport(codigo) {
     window.location.href = `${tunel_LocalHost}info/${codigo}`
@@ -80,7 +144,6 @@ async function addReport  (event) {
                 fecha_desaparicion: fechaDesaparicion,
                 hora_desaparicion: horaDesaparicion,
                 descripcion_desaparicion: descripcion,
-                mascotaid_desaparicion: mascotaId,
                 nombreUbicacion: placeName,
                 descripcionUbicacion: description,
                 latitud: latitude,
@@ -99,10 +162,11 @@ async function addReport  (event) {
                 if (response.ok) {
                     const result = await response.json();
                     toastr.success("Reporte Creado")
-                    setTimeout(() => {
+                       setTimeout(() => {
                         closeModal();
                         window.location.href='reportesMascotas'
                     }, 1500);
+                    
 
                 } else {
                     const errorResult = await response.json();

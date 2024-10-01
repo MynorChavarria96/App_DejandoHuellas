@@ -134,6 +134,12 @@
 
         }
 
+        .map_desaparicion {
+            height: 400px;
+            width: 100%;
+
+        }
+
         hr {
             border: 0;
             border-top: 1px solid #8b8a8a;
@@ -252,17 +258,34 @@
                 </div>
 
                 <hr>
-            </div>
-            <div class="col md-12 text-center mt-2">
-                <h2>Acá está mi casita</h2>
+                <div class="col md-12 text-center mt-2">
+                    <h2>Acá está mi casita</h2>
+                </div>
+
+                <div class="col md-12 p-4">
+                    <div id="map" class="map"></div>
+                </div>
+
+                <hr>
+                <div class="row-12 reporteDesaparion">
+                    <div class="col md-12 text-center mt-2 mb-2">
+                        <h2>Reporte de Desaparición</h2>
+                    </div>
+                    <div class="col-12 col-md-10 offset-md-1">
+                        <p class="text-large"><strong>Fecha y hora de desaparición:</strong> <span
+                                id="fecha_hora_desaparicion"></span></p>
+                        <p class="text-large"><strong>Información adicional:</strong> <span
+                                id="info_adicional_desaparicion"></span></p>
+                        <p class="text-large"><strong>Último lugar vista:</strong> <span id="lugar_desaparicion"></span>
+                        </p>
+
+                    </div>
+                    <div class="col md-12 p-4">
+                        <div id="map_desaparicion" class="map_desaparicion"></div>
+                    </div>
+                </div>
             </div>
 
-            <div class="col md-12 p-4">
-                <div id="map" class="map"></div>
-            </div>
-
-            <div>
-            </div>
 
         </div>
     </div>
@@ -404,23 +427,24 @@
 
                 if (placeName && latitude && longitude && description) {
 
-                    const formDataDemografico = {
-                        nombreUbicacion: placeName,
-                        descripcionUbicacion: description,
-                        latitud: latitude,
-                        longitud: longitude
-                    }
+                   
                     if (nombre_reporta && correo_reporta && fecha_reporta && telefono_reporta) {
                         const formData = {
                             nombre_reporta,
                             correo_reporta,
                             fecha_reporta,
                             telefono_reporta,
-                            descripcion_adicional: informacion_reporta,
-                            mascota_id: mascota.mascota_id
+                            descripcion_reporta: informacion_reporta,
+                            mascota_id: mascota.mascota_id,
+                            nombreUbicacion: placeName,
+                            descripcionUbicacion: description,
+                            latitud: latitude,
+                            longitud: longitude
                         };
+
+                        console.log(formData)
                         try {
-                            const response = await fetch('reporte', {
+                            const response = await fetch('reporte/Apa', {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json' },
                                 body: JSON.stringify(formData)
@@ -441,7 +465,7 @@
 
                             } else {
                                 const errorResult = await response.json();
-                                toastr.error('Error al registrar la mascota: ' + errorResult.message);
+                                toastr.error('Error al enviar reporte: ' + errorResult.message);
                             }
                         } catch (error) {
                             toastr.error('Error de conexión con la API', error);
@@ -492,7 +516,8 @@
 
                         // document.getElementById('correo').textContent = mascota.correo;
                         document.getElementById('foto').src = mascota.foto;
-                        //console.log(mascota);
+
+                        reporte(mascota.mascota_id)
 
 
                         // Ocultar el spinner y mostrar la tarjeta
@@ -530,6 +555,72 @@
                     document.body.innerHTML = '<p>Error al cargar la información de la mascota.</p>';
                 });
         });
+
+        async function reporte(id_mascota) {
+
+
+            try {
+
+                const response = await fetch('reporte/getReporteDes');
+
+                // Verifica si la respuesta es correcta (status 200-299)
+                if (!response.ok) {
+                    throw new Error('Error al obtener los reportes: ' + response.statusText);
+                }
+
+                const reports = await response.json(); // Supone que la respuesta es en formato JSON
+
+                // Filtrar los reportes por el id_mascota
+                const filteredReports = reports.filter(report => report.mascota_id === id_mascota);
+
+                // Verifica si no hay reportes después de filtrar
+                if (filteredReports.length === 0) {
+                    const noReportsMessage = document.createElement('p');
+                    noReportsMessage.textContent = 'No hay reportes disponibles para esta mascota.';
+
+                } else {
+                    const fecha_desaparicion = formatDate(new Date(filteredReports[0].fecha_desaparicion));
+                    document.getElementById('fecha_hora_desaparicion').textContent = `${fecha_desaparicion} ${filteredReports[0].hora_desaparicion}`;
+                    document.getElementById('info_adicional_desaparicion').textContent = filteredReports[0].descripcion_desaparicion;
+                    document.getElementById('lugar_desaparicion').textContent = `${filteredReports[0].nombre_ubicacion}, ${filteredReports[0].descripcion_ubicacion}`;
+
+                    // Convertir latitud y longitud a números
+                    const latitud = parseFloat(filteredReports[0].latitud);
+                    const longitud = parseFloat(filteredReports[0].longitud);
+
+                    // Inicializar el mapa centrado en las coordenadas de la mascota
+                    const map = L.map('map_desaparicion').setView([latitud, longitud], 15); // El número 15 es el nivel de zoom
+
+
+                    // Agregar los mosaicos de OpenStreetMap
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    }).addTo(map);
+
+                    // Agregar un marcador en las coordenadas de la mascota
+                    const marker = L.marker([latitud, longitud]).addTo(map);
+
+                    // Vincular un popup al marcador con el nombre y la descripción del lugar
+                    marker.bindPopup(`<strong>${filteredReports[0].nombre_ubicacion}</strong><br>${filteredReports[0].descripcion_ubicacion}`).openPopup();
+                    // Invalidar tamaño del mapa para asegurar su renderización correcta
+                    map.invalidateSize();
+
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const errorMessage = document.createElement('p');
+                errorMessage.textContent = 'No hay reportes para mostrar';
+
+            }
+        }
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0'); // Obtiene el día y lo convierte a string
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Obtiene el mes (recuerda que es 0-indexado)
+            const year = date.getFullYear(); // Obtiene el año
+
+            return `${day}-${month}-${year}`; // Retorna la fecha en formato dd-mm-yyyy
+        }
+
         // Función para calcular la edad
         function calcularEdad(fechaNacimiento) {
             const hoy = new Date();
