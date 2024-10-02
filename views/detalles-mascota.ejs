@@ -140,6 +140,9 @@
                 display: none;
                 /* Oculta la imagen ampliada en dispositivos móviles */
             }
+            #estado-reporte{
+                margin-left: 50px;
+            }
 
         }
     </style>
@@ -152,7 +155,9 @@
                 <a href="/mias-mascotas" class="btn btn-secondary">
                     <i class="fas fa-arrow-left"></i> Volver
                 </a>
+                
             </div>
+            
             <h1 class="text-center mb-4">Detalles de la Mascota</h1>
             <div class="card-body px-md-5 px-lg-6">
                 <div id="mascotaDetalles" class="row">
@@ -402,9 +407,11 @@
                             <p><strong>Color:</strong> ${mascota.color}</p>
                             <p><strong>Peso:</strong> ${mascota.peso} lbs.</p>
                             <p><strong>Enfermedad Crónica:</strong> ${mascota.enfermedad_cronica || 'N/A'}</p>
+                            <p id="badge-reporte"  class="text-center" style="display: none;"><span class="badge text-bg-danger text-center">Desparecido</span></p>
                             <p>
                                 <button class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#registroModal">Editar</button>
-                                <button class="btn btn-danger" id="btn-eliminar">Eliminar</button>
+                                <button class="btn btn-danger me-2 " id="btn-eliminar">Eliminar</button>
+                                <button class="btn btn-success" id="btn-quitar-reporte" style="display: none;">Quitar reporte</button>
                             </p>
                         </div>
                     </div>
@@ -420,7 +427,12 @@
                 </div>
                     
                 `;
-               console.log(mascota)
+                if (mascota.desaparecido === 1) {
+                document.getElementById('badge-reporte').style.display = 'block';
+                document.getElementById('btn-quitar-reporte').style.display = 'inline-block';
+            }
+
+               
              
             
                 // Convertir latitud y longitud a números
@@ -821,9 +833,67 @@
             });
         });
 
+        const btnQuitarReporte = document.getElementById('btn-quitar-reporte');
 
+        btnQuitarReporte.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const mascota_id = mascota.mascota_id;
 
+            // Mostrar la alerta de confirmación
+            Swal.fire({
+                title: '¿Estás seguro de quitar el reporte?',
+                text: "El reporte de desaparcion dejará de estar visible",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, quitar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/info/eliminarReporte/${mascota_id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            Swal.fire(
+                                'Eliminado',
+                                'El reporte ha sido eliminado.',
+                                'success'
+                            );
+
+                            // Esperar 2 segundos (2000 ms) antes de redirigir
+                            setTimeout(() => {
+                                window.location.href = '/mias-mascotas';
+                            }, 2000);
+
+                        } else {
+                            const errorResult = await response.json();
+                            Swal.fire(
+                                'Error',
+                                'Error al eliminar el reporte: ' + errorResult.message,
+                                'error'
+                            );
+                        }
+                    } catch (error) {
+                        Swal.fire(
+                            'Error',
+                            'Error de conexión con la API',
+                            'error'
+                        );
+                    }
+                }
+            });
         });
+
+
+
+        })
 
         function mostrarImagenAmpliada(imagenSrc, nombre) {
             // Actualizar el src de la imagen en el modal

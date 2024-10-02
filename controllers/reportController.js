@@ -84,3 +84,27 @@ exports.getReporteDesaparecidos = async (req, res) => {
       res.status(500).json({ message: 'Error al obtener la información del reporte' });
   }
 };
+exports.eliminarReporte = async (req, res) => {
+  try {
+    // Obtener el id de la mascota de la solicitud
+    const { mascota_id } = req.params;
+
+    // Enviar los datos a la API
+    const response = await fetch(`http://localhost:3000/api/deleteReport/${mascota_id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' }
+     
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      res.status(200).json({ message: 'Reporte eliminado' });
+    } else {
+      res.status(400).json({ message: result.message || 'Error al eliminar el reporte' });
+    }
+  } catch (error) {
+    console.error('Error al eliminar el reporte:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};

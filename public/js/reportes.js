@@ -25,10 +25,24 @@ function addNewReportToDOM(report) {
         <h5>${report.raza}</h5>
         <strong>Desapareció el:</strong>
         <h2>${fecha_desaparicion} ${report.hora_desaparicion}</h2>
-        <div class="overlay">
+        <div class="overlay-des">
             <div class="overlay-text">Desaparecido</div>
         </div>
     `;
+
+    // Seleccionar el overlay dentro de reportCard
+    const overlay = reportCard.querySelector('.overlay-des');
+    const overlayText = reportCard.querySelector('.overlay-text');
+
+    // Cambiar las clases y texto según el estado del reporte
+    if (report.activo === 0) {
+        overlay.className = 'overlay-ap'; // Cambiar clase a 'overlay-ap'
+        overlayText.textContent = 'Encontrado'; // Cambiar texto a 'Encontrado'
+    } else if (report.activo === 1) {
+        overlay.className = 'overlay-des'; // Cambiar clase a 'overlay-des'
+        overlayText.textContent = 'Desaparecido'; // Cambiar texto a 'Desaparecido'
+    }
+
     // Agrega un evento clic para mostrar los detalles del reporte
     reportCard.onclick = () => showReport(report.identificador_qr);
     reportsContainer.prepend(reportCard); // Agregar al inicio para que los nuevos aparezcan arriba
@@ -71,6 +85,8 @@ async function updateReports() {
         reportsContainer.appendChild(errorMessage);
     }
 }
+
+
 
 // async function updateReports() {
 //     const reportsContainer = document.getElementById('reportsContainer');

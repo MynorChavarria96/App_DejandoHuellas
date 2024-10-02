@@ -442,7 +442,6 @@
                             longitud: longitude
                         };
 
-                        console.log(formData)
                         try {
                             const response = await fetch('reporte/Apa', {
                                 method: 'POST',
@@ -454,6 +453,9 @@
                             if (response.ok) {
                                 const result = await response.json();
                                 toastr.success("Reporte enviado")
+                                const subject = `Encontré a ${mascota.nombre}`
+                                const body = `Hola, encontre tu mascota, contactame, ${formData.correo_reporta} ${formData.telefono_reporta} ${formData.descripcion_reporta}`
+                                sendEmail(mascota.correo, subject, body);
                                 setTimeout(() => {
                                     const modalElement = document.getElementById('ReporteAparicion');
                                     const modal = bootstrap.Modal.getInstance(modalElement);
@@ -555,6 +557,34 @@
                     document.body.innerHTML = '<p>Error al cargar la información de la mascota.</p>';
                 });
         });
+
+        async function sendEmail(email, subject, body) {
+    const url = 'https://script.google.com/macros/s/AKfycbwF6GJYqK6jDVtzEsa5HRc86UQHJ-szkNISQtKJ-U9gZcjqu47i0h20tg-VyEQvWfQD/exec'; // URL de tu WebApp o endpoint
+
+    // Datos que se enviarán en la solicitud POST
+    const data = new URLSearchParams();
+    data.append('email', email);
+    data.append('subject', subject);
+    data.append('body', body);
+
+    try {
+        // Solicitud fetch POST asincrónica
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: data.toString()
+        });
+
+        // Procesa la respuesta del servidor
+        const result = await response.text();
+        console.log(result); // Por ejemplo, "Email sent successfully."
+    } catch (error) {
+        // Maneja cualquier error en la solicitud
+        console.error('Error:', error);
+    }
+}
 
         async function reporte(id_mascota) {
 
