@@ -1,7 +1,9 @@
 exports.infoQR = (req, res) => {
   res.render('infoQr', { layout: false });
 };
-
+exports.infoReporteAparicion = (req, res) => {
+  res.render('infoReporteAparcion', { layout: false });
+};
 exports.mascotaQR = async (req, res) => {
   try {
       const { identificador_qr } = req.params;
@@ -106,5 +108,22 @@ exports.eliminarReporte = async (req, res) => {
   } catch (error) {
     console.error('Error al eliminar el reporte:', error);
     res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
+exports.getReporteAperecidos = async (req, res) => {
+  try {
+      const { identificador_qr } = req.params;
+      const response = await fetch(`http://localhost:3000/api/get/reporteApa/${identificador_qr}`);
+      const mascota = await response.json();
+
+      if (!mascota) {
+          return res.status(404).json({ message: 'Reporte no encontrado' });
+      }
+
+      res.json(mascota);
+  } catch (error) {
+      console.error('Error al obtener el reporte:', error);
+      res.status(500).json({ message: 'Error al obtener la información de la mascota' });
   }
 };

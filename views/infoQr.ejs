@@ -267,7 +267,7 @@
                 </div>
 
                 <hr>
-                <div class="row-12 reporteDesaparion">
+                <div class="row-12 " id="reporteDesaparion" >
                     <div class="col md-12 text-center mt-2 mb-2">
                         <h2>Reporte de Desaparición</h2>
                     </div>
@@ -393,7 +393,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script>
 
-
+        const tunel_LocalHost = "<%= tunel_LocalHost %>";
 
         document.addEventListener('DOMContentLoaded', function () {
             const identificador_qr = window.location.pathname.split('/').pop();
@@ -453,8 +453,10 @@
                             if (response.ok) {
                                 const result = await response.json();
                                 toastr.success("Reporte enviado")
-                                const subject = `Encontré a ${mascota.nombre}`
-                                const body = `Hola, encontre tu mascota, contactame, ${formData.correo_reporta} ${formData.telefono_reporta} ${formData.descripcion_reporta}`
+                                const subject = `Encontré a ${mascota.nombre}` 
+                                
+                                const body = `Acá te dejo mi información para que me contactes: ${tunel_LocalHost}info/ReporteAparicion/${mascota.identificador_qr}`
+                                //const body = `Hola, encontre tu mascota, contactame, ${formData.correo_reporta} ${formData.telefono_reporta} ${formData.descripcion_reporta}`
                                 sendEmail(mascota.correo, subject, body);
                                 setTimeout(() => {
                                     const modalElement = document.getElementById('ReporteAparicion');
@@ -496,8 +498,10 @@
                 })
                 .then(data => {
                     mascota = data[0]; // Acceder a la primera posición del arreglo
+                    
                     const mensaje = encodeURIComponent("Hola, me he encontrado con tu mascota. ");
                     if (mascota) {
+                       
                         const whatsappLink = `https://api.whatsapp.com/send/?phone=${mascota.telefono}&text=${mensaje}${mascota.nombre}`;
                         // Mostrar fecha de nacimiento y edad
                         const fechaNacimientoFormateada = new Date(mascota.fecha_nacimiento).toLocaleDateString();
@@ -579,7 +583,7 @@
 
         // Procesa la respuesta del servidor
         const result = await response.text();
-        console.log(result); // Por ejemplo, "Email sent successfully."
+
     } catch (error) {
         // Maneja cualquier error en la solicitud
         console.error('Error:', error);
@@ -605,10 +609,10 @@
 
                 // Verifica si no hay reportes después de filtrar
                 if (filteredReports.length === 0) {
-                    const noReportsMessage = document.createElement('p');
-                    noReportsMessage.textContent = 'No hay reportes disponibles para esta mascota.';
+                    document.getElementById('reporteDesaparion').style.display = 'none';
 
                 } else {
+                    
                     const fecha_desaparicion = formatDate(new Date(filteredReports[0].fecha_desaparicion));
                     document.getElementById('fecha_hora_desaparicion').textContent = `${fecha_desaparicion} ${filteredReports[0].hora_desaparicion}`;
                     document.getElementById('info_adicional_desaparicion').textContent = filteredReports[0].descripcion_desaparicion;
