@@ -18,6 +18,9 @@ exports.showreportesMascotas= (req, res) => {
 exports.showDetalles= (req, res) => {
   res.render('detalles-mascota', {tunel_LocalHost: process.env.TUNEL_LOCALHOST});
 };
+exports.showVacunas= (req, res) => {
+  res.render('vacunas', {tunel_LocalHost: process.env.TUNEL_LOCALHOST});
+};
 
 exports.obtenerEspecies = async (req, res) => {
   try {
@@ -26,6 +29,17 @@ exports.obtenerEspecies = async (req, res) => {
     res.json(especies);
   } catch (error) {
     res.status(500).json({ message: 'Error al obtener las especies' });
+  }
+};
+
+exports.obtenerVacunas = async (req, res) => {
+  try {
+    const mascota_id = req.params.id;
+    const response = await fetch(`http://localhost:3000/api/mascotas/vacunas/${mascota_id}`);
+    const vacunas = await response.json();
+    res.json(vacunas);
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener las vacunas' });
   }
 };
 

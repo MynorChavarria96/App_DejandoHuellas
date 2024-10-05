@@ -137,7 +137,7 @@ function cargarMascotas() {
                 data.forEach(mascota => {
                   
                     const row = document.createElement('tr');
-                    console.log(mascota)
+                   
                     row.innerHTML = `
               <td><button class="btn btn-secondary btn-detalles" data-id="${mascota.mascota_id}">Detalles</button></td>
               <td>${mascota.nombre}</td>

@@ -93,7 +93,13 @@
             z-index: 100;
 
         }
-
+        .btn-custom{
+            background-color: #487B68 !important;
+        }
+        .btn-custom:hover{
+            background-color: #315347 !important;
+        }
+       
 
         #map {
             height: 400px;
@@ -151,9 +157,13 @@
 <body>
     <div class="container-fluid px-0 px-md-5">
         <div class="card">
-            <div class="m-2 col-md-3">
-                <a href="/mias-mascotas" class="btn btn-secondary">
+           
+            <div class="d-flex justify-content-between m-2">
+                <a href="/mias-mascotas" class="btn btn-secondary btn-custom">
                     <i class="fas fa-arrow-left"></i> Volver
+                </a>
+                <a id="btn-vacunas" class="btn btn-secondary btn-custom">
+                    <i class="fa-solid fa-syringe"></i> Vacunas
                 </a>
                 
             </div>
@@ -336,7 +346,11 @@
             const btnActualizar = document.getElementById('btn-actualizar');
             const tunel_LocalHost = "<%= tunel_LocalHost %>";
             const mascota = JSON.parse(sessionStorage.getItem('mascotaSeleccionada'));
-
+            const btnVacunas = document.getElementById('btn-vacunas');
+            
+            btnVacunas.addEventListener('click', ()=>{
+                window.location.href= `http://localhost:8080/mias-mascotas/detalles/vacunas/${mascota.mascota_id}`
+            })
             
             let modalMap;
             let modalMarker;
@@ -421,7 +435,7 @@
                     <!-- Aquí va el código QR -->
                 </div>
                 <div class="col-12 col-md-8 mt-3 mx-auto d-flex justify-content-center">
-                    <button id="downloadQr" class="btn btn-primary w-100 w-md-auto">Descargar QR</button>
+                    <button id="downloadQr" class="btn btn-primary btn-custom w-100 w-md-auto">Descargar QR</button>
                 </div>
                     </div>
                 </div>
@@ -776,6 +790,7 @@
 
 
         const btnEliminar = document.getElementById('btn-eliminar');
+       
 
         btnEliminar.addEventListener('click', async (event) => {
             event.preventDefault();

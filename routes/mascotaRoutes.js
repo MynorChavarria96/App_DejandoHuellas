@@ -11,6 +11,8 @@ router.get('/reportesMascotas', ensureAuthenticated, mascotaController.showrepor
 router.get('/consejos', ensureAuthenticated, mascotaController.showConsejos);
 router.get('/mias-mascotas', ensureAuthenticated, mascotaController.showMisMascotas);
 router.get('/mias-mascotas/detalles/:id', ensureAuthenticated, mascotaController.showDetalles);
+router.get('/mias-mascotas/detalles/vacunas/:id', ensureAuthenticated, mascotaController.showVacunas);
+router.get('/mias-mascotas/detalles/vacunas/getVacunas/:id', ensureAuthenticated, mascotaController.obtenerVacunas);
 
 router.get('/especies', mascotaController.obtenerEspecies);
 router.get('/generos', mascotaController.obtenerGeneros);
