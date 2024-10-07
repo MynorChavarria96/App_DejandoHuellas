@@ -141,6 +141,29 @@ exports.eliminarMascota = async (req, res) => {
   }
 };
 
+exports.registrarVacunacion= async (req, res) => {
+  try {
+    // Enviar los datos a la API
+    const response = await fetch('http://localhost:3000/api/mascotas/vacunas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      res.status(200).json({ message: 'Vacunación registrada con éxito', resulta: result });
+    } else {
+      res.status(400).json({ message: result.message || 'Error al guardar el registro de vacunacion' });
+    }
+  } catch (error) {
+    console.error('Error al registrar vacunación', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
+
 
 
 

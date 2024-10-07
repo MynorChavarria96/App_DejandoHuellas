@@ -10,6 +10,12 @@
     <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        .form-select {
+            width: 65px !important;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,7 +27,8 @@
                 <a href="/mias-mascotas" class="btn btn-secondary btn-custom">
                     <i class="fas fa-arrow-left"></i> Volver
                 </a>
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vacunacionModal">
+                <button class="btn btn-primary" id="btn-agregar" data-bs-toggle="modal"
+                    data-bs-target="#vacunacionModal">
                     <i class="fas fa-plus"></i> Agregar Vacunación
                 </button>
             </div>
@@ -61,28 +68,44 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="vacunacionForm">
+
                         <div class="mb-3">
-                            <label for="nombreMascota" class="form-label">Nombre de la Mascota</label>
-                            <input type="text" class="form-control" id="nombreMascota" placeholder="Ej. Fido">
+                            <label for="medicamento" class="form-label">Medicamento</label>
+                            <input type="text" class="form-control" id="medicamento" placeholder="Ej. Leptospirosis"
+                                required>
                         </div>
                         <div class="mb-3">
-                            <label for="vacuna" class="form-label">Vacuna</label>
-                            <input type="text" class="form-control" id="vacuna" placeholder="Ej. Rabia">
+                            <label for="dosis" class="form-label">Dosis</label>
+                            <input type="text" class="form-control" id="dosis" placeholder="Ej. 1ml">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descripcionAdicional" class="form-label">Descripción Adicional</label>
+                            <textarea class="form-control" id="descripcionAdicional" rows="3"
+                                placeholder="Ej. Protección anual contra leptospirosis, revacunación en un año."></textarea>
                         </div>
                         <div class="mb-3">
                             <label for="fechaAplicacion" class="form-label">Fecha de Aplicación</label>
-                            <input type="date" class="form-control" id="fechaAplicacion">
+                            <input type="date" class="form-control" id="fechaAplicacion" required>
                         </div>
                         <div class="mb-3">
-                            <label for="proximaFecha" class="form-label">Próxima Fecha</label>
-                            <input type="date" class="form-control" id="proximaFecha">
+                            <label for="proximaFechaAplicacion" class="form-label">Próxima Fecha de Aplicación</label>
+                            <input type="date" class="form-control" id="proximaFechaAplicacion" required>
                         </div>
+                        <div class="mb-3">
+                            <label for="nombreVeterinario" class="form-label">Nombre del Veterinario</label>
+                            <input type="text" class="form-control" id="nombreVeterinario"
+                                placeholder="Ej. Dr. Ricardo Díaz" required>
+                        </div>
+                       
+                            <input type="number" class="form-control" id="idMascota" hidden>
+                            <input type="number" class="form-control" id="idVacunacion" hidden>
+                    
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary">Guardar Cambios</button>
+                    <button type="button" id="btn-guardar" class="btn btn-primary">Guardar Cambios</button>
                 </div>
             </div>
         </div>
@@ -100,73 +123,157 @@
 
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const id_mascota = window.location.pathname.split('/').pop();
-            cargarVacunas(id_mascota);
-        });
+     document.addEventListener('DOMContentLoaded', function () {
+    let id_mascota = window.location.pathname.split('/').pop();
+    document.getElementById('idMascota').value = id_mascota;
+    const vacunacionModal = document.getElementById('vacunacionModal');
+    let vacunasData = []; // Array para almacenar los datos de vacunación
 
-        function cargarVacunas(id) {
-            fetch(`getVacunas/${id}`)
-                .then(response => response.json())
-                .then(data => {
-                    const tbody = document.getElementById('vacunacionTablaBody');
-                    tbody.innerHTML = ''; // Limpiar contenido anterior
+    cargarVacunas(id_mascota);
 
-                    // Verificar si hay datos
-                    if (data.length > 0) {
-                        // Actualizar el encabezado con el nombre de la mascota
-                        const nombreMascota = data[0].nombre;
-                        document.getElementById('tituloVacunacion').textContent = `Control de Vacunación de ${nombreMascota}`;
+   
 
-                        // Construir filas con los datos de vacunación
-                        data.forEach(vacunacion => {
-                            const fechaAplicacion = new Date(vacunacion.fecha_aplicacion).toLocaleDateString();
-                            const proximaFechaAplicacion = vacunacion.proxima_fecha_aplicacion
-                                ? new Date(vacunacion.proxima_fecha_aplicacion).toLocaleDateString()
-                                : 'No definida';
+    document.getElementById('btn-guardar').addEventListener('click', function () {
+        const id_Vacuna = document.getElementById('idVacunacion').value;
+       if(!id_Vacuna){
+        guardarVacunacion();
+        return;
+       }
+       console.log('Editar')
+        
+    });
+});
 
-                            const row = `
-                                <tr>
-                                    <td>${vacunacion.medicamento}</td>
-                                    <td>${vacunacion.dosis}</td>
-                                    <td>${vacunacion.descripcion_adicional}</td>
-                                    <td>${fechaAplicacion}</td>
-                                    <td>${proximaFechaAplicacion}</td>
-                                    <td>${vacunacion.nombre_veterinario}</td>
-                                    <td>
-                                        <button class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#vacunacionModal">
-                                            <i class="fas fa-edit"></i> Editar
-                                        </button>
-                                        <button class="btn btn-danger">
-                                            <i class="fas fa-trash-alt"></i> Eliminar
-                                        </button>
-                                    </td>
-                                </tr>
-                            `;
+// Función para cargar las vacunas
+function cargarVacunas(id) {
+    fetch(`getVacunas/${id}`)
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('vacunacionTablaBody');
+            tbody.innerHTML = ''; // Limpiar contenido anterior
+            vacunasData = data; // Almacena los datos de vacunación en la variable
 
-                            tbody.innerHTML += row;
-                        });
+            if (data.length > 0) {
+                data.forEach(vacunacion => {
+                    const row = `
+                        <tr>
+                            <td>${vacunacion.medicamento}</td>
+                            <td>${vacunacion.dosis}</td>
+                            <td>${vacunacion.descripcion_adicional}</td>
+                            <td>${new Date(vacunacion.fecha_aplicacion).toLocaleDateString()}</td>
+                            <td>${vacunacion.proxima_fecha_aplicacion ? new Date(vacunacion.proxima_fecha_aplicacion).toLocaleDateString() : 'No definida'}</td>
+                            <td>${vacunacion.nombre_veterinario}</td>
+                            <td>
+                                <button class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#vacunacionModal" data-action="editar" data-id="${vacunacion.id_vacunacion}">
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                                <button class="btn btn-danger">
+                                    <i class="fas fa-trash-alt"></i> Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center">No hay registro de vacunación para la mascota seleccionada.</td></tr>`;
+            }
+        })
+        .catch(error => console.error('Error al cargar las vacunas:', error));
+}
 
-                        // Inicializar DataTable con responsividad
-                        $('#vacunacionTabla').DataTable({
-                            responsive: true,
-                            language: { url: "//cdn.datatables.net/plug-ins/1.11.5/i18n/es-ES.json" }
-                        });
-                    } else {
-                        // Actualizar el encabezado sin el nombre de la mascota
-                        document.getElementById('tituloVacunacion').textContent = `Control de Vacunación`;
+// Cargar datos de vacunación para editar
+function cargarDatosVacunacion(vacunacion) {
+  
+    // Rellena los campos del formulario con los datos
+    document.getElementById('idVacunacion').value = vacunacion.id_vacunacion;
+    document.getElementById('medicamento').value = vacunacion.medicamento;
+    document.getElementById('dosis').value = vacunacion.dosis;
+    document.getElementById('descripcionAdicional').value = vacunacion.descripcion_adicional;
+    document.getElementById('fechaAplicacion').value = vacunacion.fecha_aplicacion.split('T')[0]; // Ajusta según el formato de fecha
+     // Manejar la proxima_fecha_aplicacion con verificación
+     if (vacunacion.proxima_fecha_aplicacion) {
+        document.getElementById('proximaFechaAplicacion').value = vacunacion.proxima_fecha_aplicacion.split('T')[0];
+    } else {
+        document.getElementById('proximaFechaAplicacion').value = ''; // O cualquier valor predeterminado que desees
+    }
+    document.getElementById('nombreVeterinario').value = vacunacion.nombre_veterinario;
+}
 
-                        // Mostrar mensaje de que no hay datos
-                        tbody.innerHTML = `
-                            <tr>
-                                <td colspan="7" class="text-center">No hay registro de vacunación para la mascota seleccionada.</td>
-                            </tr>
-                        `;
-                    }
-                })
-                .catch(error => console.error('Error al cargar las vacunas:', error));
+// Función para guardar la vacunación
+function guardarVacunacion() {
+    const vacunacionData = {
+        medicamento: document.getElementById('medicamento').value,
+        dosis: document.getElementById('dosis').value,
+        descripcion_adicional: document.getElementById('descripcionAdicional').value,
+        fecha_aplicacion: document.getElementById('fechaAplicacion').value,
+        proxima_fecha_aplicacion: document.getElementById('proximaFechaAplicacion').value,
+        nombre_veterinario: document.getElementById('nombreVeterinario').value,
+        id_mascota: document.getElementById('idMascota').value,
+    };
+
+    // Validar campos obligatorios
+    if (!vacunacionData.medicamento || !vacunacionData.fecha_aplicacion || !vacunacionData.nombre_veterinario) {
+        toastr.warning('Por favor, complete todos los campos obligatorios');
+    } else {
+        // Enviar datos a la ruta especificada
+        fetch('/mias-mascotas/detalles/vacunas/registrar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(vacunacionData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                toastr.success('Vacunación registrada exitosamente');
+                location.reload(); // Recargar la página para ver los cambios
+            })
+            .catch(error => {
+                console.error('Error al enviar la vacunación:', error);
+                toastr.error('Hubo un problema al registrar la vacunación');
+            });
+    }
+}
+
+// Función para resetear los campos
+function resetearCampos() {
+    document.getElementById('idVacunacion').value = '';
+    document.getElementById('medicamento').value = '';
+    document.getElementById('dosis').value = '';
+    document.getElementById('descripcionAdicional').value = '';
+    document.getElementById('fechaAplicacion').value = '';
+    document.getElementById('proximaFechaAplicacion').value = '';
+    document.getElementById('nombreVeterinario').value = '';
+}
+ // Cambia el título del modal al abrir
+ vacunacionModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; // Botón que abrió el modal
+        const action = button.getAttribute('data-action'); // Puede ser 'editar' o 'agregar'
+        
+        // Cambia el título dependiendo de la acción
+        if (action === 'editar') {
+            document.getElementById('vacunacionModalLabel').textContent = 'Editar Vacunación';
+            const idVacunacion = button.getAttribute('data-id'); // Obtén el ID de la vacunación
+            const idVacunacionNum = Number(idVacunacion);
+            
+            // Cargar los datos de la vacunación desde el array
+            const vacunacion = vacunasData.find(v => v.id_vacunacion === idVacunacionNum);
+            cargarDatosVacunacion(vacunacion)
+        } else {
+            document.getElementById('vacunacionModalLabel').textContent = 'Agregar Vacunación';
+            resetearCampos(); // Resetea los campos al agregar
         }
+    });
+
+
     </script>
+    
 </body>
 
 </html>

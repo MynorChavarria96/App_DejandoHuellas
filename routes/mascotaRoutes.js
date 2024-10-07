@@ -13,6 +13,7 @@ router.get('/mias-mascotas', ensureAuthenticated, mascotaController.showMisMasco
 router.get('/mias-mascotas/detalles/:id', ensureAuthenticated, mascotaController.showDetalles);
 router.get('/mias-mascotas/detalles/vacunas/:id', ensureAuthenticated, mascotaController.showVacunas);
 router.get('/mias-mascotas/detalles/vacunas/getVacunas/:id', ensureAuthenticated, mascotaController.obtenerVacunas);
+router.post('/mias-mascotas/detalles/vacunas/registrar', ensureAuthenticated, mascotaController.registrarVacunacion);
 
 router.get('/especies', mascotaController.obtenerEspecies);
 router.get('/generos', mascotaController.obtenerGeneros);
