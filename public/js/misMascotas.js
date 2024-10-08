@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     btnCerrar.addEventListener('click', () => {
         resetFormAndMap();
+        reserModal();
     });
 
     btnGuardar.addEventListener('click', async (event) => {
@@ -63,12 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const result = await response.json();
  
                 toastr.success('Mascota registrada exitosamente');
-                  const modalElement = document.getElementById('registroModal');
-                  const modal = bootstrap.Modal.getInstance(modalElement);
-                  modal.hide();
-                  document.getElementById('regForm').reset();
-                  document.getElementById('previewImage').src = '/public/images/default.jpg';
-                  document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+                  reserModal();
                   resetFormAndMap();
                   window.location.href = '/mias-mascotas';
             } else {
@@ -283,6 +279,15 @@ function showError(error) {
             alert("Ocurrió un error desconocido.");
             break;
     }
+}
+
+function reserModal(){
+    const modalElement = document.getElementById('registroModal');
+                  const modal = bootstrap.Modal.getInstance(modalElement);
+                  modal.hide();
+                  document.getElementById('regForm').reset();
+                  document.getElementById('previewImage').src = '/public/images/default.jpg';
+                  document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
 }
 
 function resetFormAndMap() {

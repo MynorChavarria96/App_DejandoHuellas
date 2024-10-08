@@ -139,9 +139,13 @@
         guardarVacunacion();
         return;
        }
-       console.log('Editar')
+       actualizarVacunacion(id_Vacuna)
+
         
     });
+
+ 
+    
 });
 
 // Función para cargar las vacunas
@@ -167,13 +171,22 @@ function cargarVacunas(id) {
                                 <button class="btn btn-warning me-2" data-bs-toggle="modal" data-bs-target="#vacunacionModal" data-action="editar" data-id="${vacunacion.id_vacunacion}">
                                     <i class="fas fa-edit"></i> Editar
                                 </button>
-                                <button class="btn btn-danger">
+                                <button class="btn btn-danger btn-eliminar" data-action="eliminar" data-id="${vacunacion.id_vacunacion}">
                                     <i class="fas fa-trash-alt"></i> Eliminar
                                 </button>
                             </td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
+                });
+                // Añadir el evento de click a todos los botones de eliminar
+                const eliminarButtons = document.querySelectorAll('.btn-eliminar');
+                eliminarButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const idVacunacion = button.getAttribute('data-id');
+                       eliminarvacunacion(idVacunacion)
+                       
+                    });
                 });
             } else {
                 tbody.innerHTML = `<tr><td colspan="7" class="text-center">No hay registro de vacunación para la mascota seleccionada.</td></tr>`;
@@ -184,7 +197,7 @@ function cargarVacunas(id) {
 
 // Cargar datos de vacunación para editar
 function cargarDatosVacunacion(vacunacion) {
-  
+
     // Rellena los campos del formulario con los datos
     document.getElementById('idVacunacion').value = vacunacion.id_vacunacion;
     document.getElementById('medicamento').value = vacunacion.medicamento;
@@ -200,6 +213,58 @@ function cargarDatosVacunacion(vacunacion) {
     document.getElementById('nombreVeterinario').value = vacunacion.nombre_veterinario;
 }
 
+function eliminarvacunacion(id_vacunacion){
+ // Mostrar la alerta de confirmación
+ Swal.fire({
+                title: '¿Estás seguro de eliminar esta vacuna?',
+                text: "la vacuna ya no se mostrará en la lista",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        const response = await fetch(`/mias-mascotas/detalles/vacunas/eliminar/${id_vacunacion}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            }
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                            Swal.fire(
+                                'Eliminada',
+                                'La vacuna ha sido eliminada.',
+                                'success'
+                            );
+
+        
+                            setTimeout(() => {
+                                location.reload(); 
+                            }, 1500);
+
+                        } else {
+                            const errorResult = await response.json();
+                            Swal.fire(
+                                'Error',
+                                'Error al eliminar el reporte: ' + errorResult.message,
+                                'error'
+                            );
+                        }
+                    } catch (error) {
+                        Swal.fire(
+                            'Error',
+                            'Error de conexión con la API',
+                            'error'
+                        );
+                    }
+                }
+            });
+}
 // Función para guardar la vacunación
 function guardarVacunacion() {
     const vacunacionData = {
@@ -241,6 +306,46 @@ function guardarVacunacion() {
     }
 }
 
+function actualizarVacunacion(id_vacunacion) {
+    const vacunacionData = {
+        medicamento: document.getElementById('medicamento').value,
+        dosis: document.getElementById('dosis').value,
+        descripcion_adicional: document.getElementById('descripcionAdicional').value,
+        fecha_aplicacion: document.getElementById('fechaAplicacion').value,
+        proxima_fecha_aplicacion: document.getElementById('proximaFechaAplicacion').value,
+        nombre_veterinario: document.getElementById('nombreVeterinario').value,
+        id_mascota: document.getElementById('idMascota').value,
+    };
+
+    // Validar campos obligatorios
+    if (!vacunacionData.medicamento || !vacunacionData.fecha_aplicacion || !vacunacionData.nombre_veterinario) {
+        toastr.warning('Por favor, complete todos los campos obligatorios');
+    } else {
+        // Enviar datos a la ruta especificada
+        fetch(`/mias-mascotas/detalles/vacunas/actualizar/${id_vacunacion}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(vacunacionData)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error en la respuesta del servidor');
+                }
+                return response.json();
+            })
+            .then(data => {
+                toastr.success('Vacunación actualizada exitosamente');
+                location.reload(); // Recargar la página para ver los cambios
+            })
+            .catch(error => {
+                console.error('Error al actualizar la vacunación:', error);
+                toastr.error('Hubo un problema al actualizar la vacunación');
+            });
+    }
+}
+
 // Función para resetear los campos
 function resetearCampos() {
     document.getElementById('idVacunacion').value = '';
@@ -265,11 +370,18 @@ function resetearCampos() {
             // Cargar los datos de la vacunación desde el array
             const vacunacion = vacunasData.find(v => v.id_vacunacion === idVacunacionNum);
             cargarDatosVacunacion(vacunacion)
-        } else {
+        }
+        else {
             document.getElementById('vacunacionModalLabel').textContent = 'Agregar Vacunación';
             resetearCampos(); // Resetea los campos al agregar
         }
+
+       
+
+
     });
+
+    
 
 
     </script>

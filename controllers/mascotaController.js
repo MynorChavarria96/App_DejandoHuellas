@@ -163,6 +163,57 @@ exports.registrarVacunacion= async (req, res) => {
   }
 };
 
+exports.actualizarVacunacion= async (req, res) => {
+  try {
+    const { id_vacunacion } = req.params;
+
+    // Enviar los datos a la API
+    const response = await fetch(`http://localhost:3000/api/mascotas/vacunas/update/${id_vacunacion}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body)
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      res.status(200).json({ message: 'Vacunación actualizada con éxito', resulta: result });
+    } else {
+      res.status(400).json({ message: result.message || 'Error al actualizar el registro de vacunacion' });
+    }
+  } catch (error) {
+    console.error('Error al actualizar vacunación', error);
+    res.status(500).json({ message: 'Error interno del servidor', eerr });
+  }
+};
+
+exports.eliminarVacunacion = async (req, res) => {
+  try {
+    // Obtener el id de la mascota de la solicitud
+    const { id_vacunacion } = req.params;
+
+    // Enviar los datos a la API
+    const response = await fetch(`http://localhost:3000/api/mascotas/vacunas/${id_vacunacion}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+     
+    });
+
+    const result = await response.json();
+
+    if (response.ok) {
+      res.status(200).json({ message: 'Vacuna eliminada' });
+    } else {
+      res.status(400).json({ message: result.message || 'Error al eliminar vacuna' });
+    }
+  } catch (error) {
+    console.error('Error al eliminar la vacuna:', error);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
+
+
 
 
 

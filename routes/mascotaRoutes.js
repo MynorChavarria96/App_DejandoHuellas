@@ -14,6 +14,8 @@ router.get('/mias-mascotas/detalles/:id', ensureAuthenticated, mascotaController
 router.get('/mias-mascotas/detalles/vacunas/:id', ensureAuthenticated, mascotaController.showVacunas);
 router.get('/mias-mascotas/detalles/vacunas/getVacunas/:id', ensureAuthenticated, mascotaController.obtenerVacunas);
 router.post('/mias-mascotas/detalles/vacunas/registrar', ensureAuthenticated, mascotaController.registrarVacunacion);
+router.put('/mias-mascotas/detalles/vacunas/actualizar/:id_vacunacion', ensureAuthenticated, mascotaController.actualizarVacunacion);
+router.delete('/mias-mascotas/detalles/vacunas/eliminar/:id_vacunacion', ensureAuthenticated, mascotaController.eliminarVacunacion);
 
 router.get('/especies', mascotaController.obtenerEspecies);
 router.get('/generos', mascotaController.obtenerGeneros);
