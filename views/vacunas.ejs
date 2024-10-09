@@ -165,7 +165,7 @@
         
     });
     document.getElementById('btn-imprimir').addEventListener('click', ()=>{
-        window.location.href=`${id_mascota}/imprimir`
+        window.location.href=`imprimir/${id_mascota}`
     })
 
  
@@ -182,7 +182,7 @@ function cargarVacunas(id) {
             const tbody = document.getElementById('vacunacionTablaBody');
             tbody.innerHTML = ''; // Limpiar contenido anterior
             vacunasData = data; // Almacena los datos de vacunación en la variable
-            console.log(vacunasData)
+            
             if (data.length > 0) {
                 data.forEach(vacunacion => {
                     const row = `

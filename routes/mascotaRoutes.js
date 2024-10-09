@@ -8,7 +8,7 @@ const mascotaController = require('../controllers/mascotaController');
 router.get('/', ensureAuthenticated, mascotaController.showIndex);
 
 router.get('/reportesMascotas', ensureAuthenticated, mascotaController.showreportesMascotas);
-router.get('/mias-mascotas/detalles/vacunas/:mascota_id/imprimir', ensureAuthenticated, mascotaController.vistaImpresion);
+router.get('/mias-mascotas/detalles/vacunas/imprimir/:mascota_id', ensureAuthenticated, mascotaController.vistaImpresion);
 router.get('/consejos', ensureAuthenticated, mascotaController.showConsejos);
 router.get('/mias-mascotas', ensureAuthenticated, mascotaController.showMisMascotas);
 router.get('/mias-mascotas/detalles/:id', ensureAuthenticated, mascotaController.showDetalles);
@@ -17,6 +17,8 @@ router.get('/mias-mascotas/detalles/vacunas/getVacunas/:id', ensureAuthenticated
 router.post('/mias-mascotas/detalles/vacunas/registrar', ensureAuthenticated, mascotaController.registrarVacunacion);
 router.put('/mias-mascotas/detalles/vacunas/actualizar/:id_vacunacion', ensureAuthenticated, mascotaController.actualizarVacunacion);
 router.delete('/mias-mascotas/detalles/vacunas/eliminar/:id_vacunacion', ensureAuthenticated, mascotaController.eliminarVacunacion);
+router.get('/mias-mascotas/detalles/vacunas/imprimir/reporte/:mascota_id', ensureAuthenticated, mascotaController.getReporteimprimir);
+
 
 router.get('/especies', mascotaController.obtenerEspecies);
 router.get('/generos', mascotaController.obtenerGeneros);

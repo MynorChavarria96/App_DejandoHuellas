@@ -127,3 +127,4 @@ exports.getReporteAperecidos = async (req, res) => {
       res.status(500).json({ message: 'Error al obtener la información de la mascota' });
   }
 };
+
