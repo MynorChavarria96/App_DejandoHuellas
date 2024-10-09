@@ -8,6 +8,7 @@ const mascotaController = require('../controllers/mascotaController');
 router.get('/', ensureAuthenticated, mascotaController.showIndex);
 
 router.get('/reportesMascotas', ensureAuthenticated, mascotaController.showreportesMascotas);
+router.get('/mias-mascotas/detalles/vacunas/:mascota_id/imprimir', ensureAuthenticated, mascotaController.vistaImpresion);
 router.get('/consejos', ensureAuthenticated, mascotaController.showConsejos);
 router.get('/mias-mascotas', ensureAuthenticated, mascotaController.showMisMascotas);
 router.get('/mias-mascotas/detalles/:id', ensureAuthenticated, mascotaController.showDetalles);

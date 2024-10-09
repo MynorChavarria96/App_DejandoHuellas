@@ -15,6 +15,13 @@ exports.showMisMascotas= (req, res) => {
 exports.showreportesMascotas= (req, res) => {
   res.render('reportes');
 };
+exports.vistaImpresion = (req, res) => {
+
+
+  res.render('imprimir', { layout: false });
+
+};
+
 exports.showDetalles= (req, res) => {
   res.render('detalles-mascota', {tunel_LocalHost: process.env.TUNEL_LOCALHOST});
 };
