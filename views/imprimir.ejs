@@ -163,23 +163,44 @@
             </tbody>
         </table>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.3/html2pdf.bundle.min.js"></script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             let id_mascota = window.location.pathname.split('/').pop();
-           
-                 // Obtener los datos de la mascota
-        fetch(`reporte/${id_mascota}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta de la red');
-                }
-                return response.json();
-            })
-            .then(data => {
-                const mascotaData = data[0];
-                // Llenar datos de la mascota
-                document.getElementById('mascotaNombre').innerText = mascotaData.mascota_nombre;
+    
+            // Función para descargar el PDF
+            function descargarPDF() {
+                const element = document.body; // Selecciona el cuerpo de la página para convertirlo a PDF
+                const opt = {
+                    margin:       0.5,
+                    filename:     'ReporteVacunacion.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2 },
+                    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+    
+                // Generar el PDF
+                html2pdf().from(element).set(opt).save();
+            }
+    
+            // Función para detectar si es un dispositivo móvil
+            function esDispositivoMovil() {
+                return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            }
+    
+            // Obtener los datos de la mascota
+            fetch(`reporte/${id_mascota}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error en la respuesta de la red');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const mascotaData = data[0];
+                    // Llenar datos de la mascota
+                    document.getElementById('mascotaNombre').innerText = mascotaData.mascota_nombre;
                     document.getElementById('mascotaFechaNacimiento').innerText = new Date(mascotaData.mascota_fecha_nacimiento).toLocaleDateString();
                     document.getElementById('mascotaEspecie').innerText = mascotaData.mascota_especie;
                     document.getElementById('mascotaRaza').innerText = mascotaData.mascota_raza;
@@ -187,53 +208,63 @@
                     document.getElementById('mascotaColor').innerText = mascotaData.mascota_color;
                     document.getElementById('mascotaPeso').innerText = `${mascotaData.mascota_peso} lbs.`;
                     document.getElementById('mascotaEnfermedadCrónica').innerText = mascotaData.mascota_enfermedad_cronica;
-
+    
                     // Llenar datos del propietario
                     document.getElementById('propietarioNombre').innerText = mascotaData.propietario_nombre;
                     document.getElementById('propietarioResidencia').innerText = mascotaData.propietario_residencia;
                     document.getElementById('propietarioTelefono').innerText = mascotaData.propietario_telefono;
                     document.getElementById('propietarioCorreo').innerText = mascotaData.propietario_correo;
-
+    
                     // Mostrar la foto de la mascota en el lugar deseado
                     const mascotaFoto = document.getElementById('mascotaFoto');
-                    mascotaFoto.src = mascotaData.mascota_foto; // Cambiar la fuente de la imagen
-                    mascotaFoto.alt = `Foto de ${mascotaData.mascota_nombre}`; // Cambiar el texto alternativo
-                return fetch(`/mias-mascotas/detalles/vacunas/getVacunas/${id_mascota}`);
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error al obtener las vacunas');
-                }
-                return response.json();
-            })
-            .then(vacunas => {
-                const vacunasTableBody = document.getElementById('vacunasTableBody');
-                if (vacunas.length > 0) {
-                vacunas.forEach(vacuna => {
-              
-                    vacunasTableBody.innerHTML += `
-                        <tr>
-                            <td>${vacuna.medicamento}</td>
-                            <td>${vacuna.dosis}</td>
-                            <td>${vacuna.descripcion_adicional}</td>
-                            <td>${new Date(vacuna.fecha_aplicacion).toLocaleDateString()}</td>
-                            <td>${new Date(vacuna.proxima_fecha_aplicacion).toLocaleDateString()}</td>
-                            <td>${vacuna.nombre_veterinario}</td>
-                        </tr>
-                    `;
+                    mascotaFoto.src = mascotaData.mascota_foto;
+                    mascotaFoto.alt = `Foto de ${mascotaData.mascota_nombre}`;
+    
+                    return fetch(`/mias-mascotas/detalles/vacunas/getVacunas/${id_mascota}`);
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener las vacunas');
+                    }
+                    return response.json();
+                })
+                .then(vacunas => {
+                    const vacunasTableBody = document.getElementById('vacunasTableBody');
+                    if (vacunas.length > 0) {
+                        vacunas.forEach(vacuna => {
+                            vacunasTableBody.innerHTML += `
+                                <tr>
+                                    <td>${vacuna.medicamento}</td>
+                                    <td>${vacuna.dosis}</td>
+                                    <td>${vacuna.descripcion_adicional}</td>
+                                    <td>${new Date(vacuna.fecha_aplicacion).toLocaleDateString()}</td>
+                                    <td>${new Date(vacuna.proxima_fecha_aplicacion).toLocaleDateString()}</td>
+                                    <td>${vacuna.nombre_veterinario}</td>
+                                </tr>
+                            `;
+                        });
+                    } else {
+                        vacunasTableBody.innerHTML = `<tr><td colspan="7" class="text-center">No hay registro de vacunación para la mascota seleccionada.</td></tr>`;
+                    }
+    
+                    // Descargar el PDF automáticamente si es móvil
+                    if (esDispositivoMovil()) {
+                        descargarPDF();
+                    } else {
+                        // Mostrar el cuadro de impresión en otros dispositivos
+                        window.print();
+                    }
+                })
+                .catch(error => {
+                    console.error('Ha ocurrido un error:', error);
                 });
-                   
-            }else{
-                vacunasTableBody.innerHTML = `<tr><td colspan="7" class="text-center">No hay registro de vacunación para la mascota seleccionada.</td></tr>`;
-            }
-            // Mostrar el cuadro de diálogo de impresión después de cargar los datos
-            window.print();
-            })
-            .catch(error => {
-                console.error('Ha ocurrido un error:', error);
-            });
+     // Redirigir después de imprimir
+     window.addEventListener('afterprint', function() {
+            window.location.href = `/mias-mascotas/detalles/vacunas/${id_mascota}`; // Cambia '/ruta-a-tu-pagina' por la URL deseada
+        });
         });
     </script>
+    
 </body>
 
 </html>

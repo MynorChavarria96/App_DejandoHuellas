@@ -237,18 +237,7 @@ exports.showConsejos = (req, res) => {
         titulo: "Vacunación y Prevención de Enfermedades",
         contenido: "La vacunación es crucial para proteger a las mascotas de enfermedades graves y potencialmente mortales. Es importante seguir un calendario de vacunación recomendado por los veterinarios y mantener actualizados los registros de vacunación."
     },
-    {
-        titulo: "Nutrición Adecuada",
-        contenido: "Una dieta equilibrada es esencial para la salud de las mascotas. Los alimentos deben ser adecuados para la especie, la edad, el tamaño y el nivel de actividad de la mascota. Consulta con un veterinario para obtener recomendaciones personalizadas."
-    },
-    {
-        titulo: "Ejercicio Regular",
-        contenido: "El ejercicio no solo ayuda a mantener un peso saludable, sino que también contribuye al bienestar mental de las mascotas. Los paseos diarios, los juegos y la interacción con otras mascotas pueden ser actividades beneficiosas."
-    },
-    {
-        titulo: "Salud Mental y Estimulación",
-        contenido: "Las mascotas necesitan estimulación mental para evitar el aburrimiento y el estrés. Juguetes interactivos, entrenamiento de obediencia y tiempo de juego pueden ayudar a mantener su mente activa."
-    },
+    
     {
         titulo: "Control de Parásitos",
         contenido: "Los parásitos como pulgas, garrapatas y lombrices pueden afectar la salud de las mascotas. Es importante realizar controles regulares y seguir tratamientos preventivos recomendados por los veterinarios."
@@ -269,25 +258,42 @@ exports.showConsejos = (req, res) => {
         titulo: "Uso de Collares con Placas QR para Mascotas Perdidas",
         contenido: "Los collares con placas QR son una herramienta tecnológica innovadora para prevenir que las mascotas se pierdan. Al escanear el código QR con un smartphone, cualquier persona que encuentre a tu mascota puede acceder a información de contacto y detalles importantes, facilitando su rápida devolución."
     },
-    {
-        titulo: "Importancia de la Esterilización y Castración",
-        contenido: "La esterilización y castración no solo ayudan a controlar la población de mascotas, sino que también ofrecen beneficios de salud, como la reducción del riesgo de ciertas enfermedades y comportamientos no deseados. Consulta con tu veterinario sobre el mejor momento para realizar estos procedimientos."
-    },
-    {
-        titulo: "Identificación y Manejo del Estrés en Mascotas",
-        contenido: "El estrés puede afectar negativamente la salud y el comportamiento de las mascotas. Aprende a identificar las señales de estrés y descubre estrategias efectivas para manejarlo, como la creación de un entorno seguro, el uso de juguetes estimulantes y la implementación de rutinas consistentes."
-    },
-    {
-        titulo: "Adiestramiento Positivo para una Mejor Convivencia",
-        contenido: "El adiestramiento positivo se basa en recompensas y refuerzos positivos para enseñar a las mascotas comportamientos deseados. Este método fomenta una relación de confianza y respeto, mejorando la convivencia y reduciendo problemas de comportamiento."
-    },
-    {
-        titulo: "Selección de Juguetes Adecuados para la Estimulación de tu Mascota",
-        contenido: "Elegir los juguetes adecuados es esencial para mantener a tu mascota entretenida y estimulada mentalmente. Opta por juguetes que se adapten a las preferencias y necesidades específicas de tu mascota, ya sea para morder, buscar o resolver puzzles."
-    },
+    
     {
         titulo: "Seguridad en el Hogar para Perros y Gatos",
         contenido: "Asegurar tu hogar es fundamental para prevenir accidentes y garantizar la seguridad de tus mascotas. Revisa y elimina posibles peligros, como productos tóxicos, cables eléctricos expuestos y objetos pequeños que puedan ser ingeridos. Crea espacios seguros donde tus mascotas puedan moverse libremente."
+    },
+    {
+      "titulo": "La importancia de los collares inteligentes para mascotas",
+      "contenido": "Los collares inteligentes permiten un seguimiento constante de la actividad física y la ubicación de tu mascota. Estos dispositivos pueden alertarte si tu perro o gato se aleja de su zona segura o si tiene una baja actividad física, ayudando a prevenir la obesidad y mejorar su salud general. Además, muchos de estos collares tienen funciones de monitoreo de salud, como el ritmo cardíaco y la calidad del sueño, lo que permite detectar problemas antes de que se agraven."
+    },
+    {
+      "titulo": "¿Por qué es esencial vacunar a tu mascota?",
+      "contenido": "Las vacunas son fundamentales para proteger a tu mascota contra enfermedades peligrosas como la rabia, moquillo y parvovirus. Al mantener al día el calendario de vacunación, no solo cuidas la salud de tu perro o gato, sino que también proteges a otros animales y personas. Un sistema de notificación de vacunación, como el que ofrece este sistema, te ayudará a recordar las fechas importantes para asegurar que tu mascota esté siempre protegida."
+    },
+    {
+      "titulo": "Identificación mediante códigos QR: Una herramienta clave para mascotas perdidas",
+      "contenido": "Agregar un código QR al collar de tu mascota puede marcar la diferencia si se extravía. Con un escaneo rápido, cualquier persona que encuentre a tu mascota puede acceder a su información básica, incluyendo tus datos de contacto, facilitando una rápida reunión. Esta tecnología es fácil de implementar y asegura que incluso si tu mascota pierde su placa tradicional, siempre será identificable."
+    },
+    {
+      "titulo": "Alimentación balanceada para una vida larga y saludable",
+      "contenido": "La dieta es clave en la salud de cualquier mascota. Proporcionar alimentos balanceados y ricos en nutrientes esenciales ayudará a tu perro o gato a mantener un peso saludable, tener energía y prevenir enfermedades. Consulta siempre con tu veterinario para conocer las mejores opciones alimenticias para tu mascota, dependiendo de su raza, tamaño y edad."
+    },
+    {
+      "titulo": "La importancia del ejercicio diario en mascotas",
+      "contenido": "El ejercicio regular no solo mantiene a tu mascota en forma, sino que también mejora su bienestar mental. Paseos diarios, juegos de buscar la pelota o juguetes interactivos pueden ayudar a reducir el estrés y la ansiedad en mascotas. Los collares inteligentes también permiten monitorear su nivel de actividad, asegurándote de que tu mascota esté recibiendo el ejercicio necesario para mantenerse saludable."
+    },
+    {
+      "titulo": "Higiene dental: Un factor clave para la salud de tu mascota",
+      "contenido": "La salud bucal es un aspecto que muchos propietarios tienden a descuidar. Sin embargo, la acumulación de sarro y las infecciones en las encías pueden derivar en problemas graves de salud. Cepillar los dientes de tu mascota regularmente y ofrecerle juguetes dentales son formas sencillas de mantener su boca sana y prevenir enfermedades cardíacas y renales."
+    },
+    {
+      "titulo": "Monitoreo de la salud en tiempo real con dispositivos",
+      "contenido": "Los dispositivos, como los collares inteligentes, ofrecen un monitoreo continuo de los signos vitales de tu mascota. Estas herramientas permiten detectar cambios sutiles en su comportamiento o salud que podrían pasar desapercibidos de otro modo, dándote la oportunidad de actuar rápidamente ante cualquier anomalía. Esto es especialmente útil para mascotas con condiciones crónicas que requieren atención constante."
+    },
+    {
+      "titulo": "Protección contra pulgas y garrapatas: Un paso esencial en el cuidado de tu mascota",
+      "contenido": "Las pulgas y garrapatas no solo causan molestias, sino que también pueden transmitir enfermedades graves a tu mascota. Mantener un régimen de control antiparasitario, tanto en tu hogar como en tu mascota, es crucial para evitar problemas como la anemia, la enfermedad de Lyme y otros padecimientos. Asegúrate de consultar con tu veterinario sobre los mejores productos preventivos según el tamaño y tipo de tu mascota."
     }
 ];
 
@@ -295,28 +301,28 @@ exports.showConsejos = (req, res) => {
   // Definir los videos manualmente
   const videos = [
       {
-          titulo: "Como cuidar a cachorro",
-          videoid: "9dDemBxxulo"
+          titulo: "Tengo una mascota ¿Cómo cuidar a nuestras mascotas?",
+          videoid: "z6qn2YzE54M"
       },
       {
-          titulo: "Consejos de Alimentación",
-          videoid: "your-video-id-2" // Reemplaza con el ID real del video
+          titulo: "Cuidado de mascotas, La Educación Sana",
+          videoid: "T-UPNLaWSKU" // Reemplaza con el ID real del video
       },
       {
-          titulo: "Ejercicio para Mascotas",
-          videoid: "your-video-id-3" // Reemplaza con el ID real del video
+          titulo: "7 CONSEJOS para CUIDAR la SALUD de tu PERRO",
+          videoid: "TbgB5zH8_3E" // Reemplaza con el ID real del video
       },
       {
-          titulo: "Señales de Salud en Mascotas",
-          videoid: "your-video-id-4" // Reemplaza con el ID real del video
+          titulo: "Conoce 5 responsabilidades de tener una mascota",
+          videoid: "dX4yefV2H_A" // Reemplaza con el ID real del video
       },
       {
-          titulo: "Cómo Socializar a tu Perro",
-          videoid: "your-video-id-5" // Reemplaza con el ID real del video
+          titulo: "Cómo ayudar a un gato callejero: Consejos para rescatar, cuidar y adoptar",
+          videoid: "cmaN3kXbv7s" // Reemplaza con el ID real del video
       },
       {
-          titulo: "Importancia de la Vacunación",
-          videoid: "your-video-id-6" // Reemplaza con el ID real del video
+          titulo: "Tenencia responsable: los cuidados básicos que debe tener con una mascota",
+          videoid: "618Fk4PhnY4" // Reemplaza con el ID real del video
       }
   ];
 
